@@ -64,9 +64,22 @@ def turnClockwise(radius):
 
 	print "Destination reached!"
 
-while True:
-	length = float(input("Enter a length to rotate (in cm): "))
-	turnClockwise(length)
+#while True:
+#	length = float(input("Enter a length to rotate (in cm): "))
+#	turnClockwise(length)
+
+runForLength(40)
+turnClockwise(3.14/2)
+
+runForLength(40)
+turnClockwise(3.14/2)
+
+runForLength(40)
+turnClockwise(3.14/2)
+
+runForLength(40)
+turnClockwise(3.14/2)
+
 
 interface.terminate()
 
