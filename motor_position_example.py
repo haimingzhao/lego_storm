@@ -12,7 +12,7 @@ interface.motorEnable(motors[1])
 motorParams1 = interface.MotorAngleControllerParameters()
 motorParams1.maxRotationAcceleration = 6.0
 motorParams1.maxRotationSpeed = 12.0
-motorParams1.feedForwardGain = 255/15.0
+motorParams1.feedForwardGain = 255/12.0
 motorParams1.minPWM = 43.0
 motorParams1.pidParameters.minOutput = -255
 motorParams1.pidParameters.maxOutput = 255
@@ -23,7 +23,7 @@ motorParams1.pidParameters.k_d = 70
 motorParams2 = interface.MotorAngleControllerParameters()
 motorParams2.maxRotationAcceleration = 6.0
 motorParams2.maxRotationSpeed = 12.0
-motorParams2.feedForwardGain = 255/15.0
+motorParams2.feedForwardGain = 255/12.0
 motorParams2.minPWM = 38.0
 motorParams2.pidParameters.minOutput = -255
 motorParams2.pidParameters.maxOutput = 255
