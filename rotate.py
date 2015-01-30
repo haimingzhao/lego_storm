@@ -12,7 +12,7 @@ minPWM = 36
 kp = 200
 ki = 180
 kd = 330
-width = 17.05
+width = 17.08
 
 calibration.calibrate(interface, motors)
 
@@ -42,21 +42,21 @@ def turnClockwise(radius):
 
 	print "Destination reached!"
 
-#while True:
-#	radius = float(input("Enter a  to rotate (in radius): "))
-#	turnClockwise(20.0*math.pi)
+while True:
+	rnds = float(input("Enter number of rounds : "))
+	turnClockwise(rnds*2*math.pi)
 
-runForLength(40)
-turnClockwise(math.pi/2)
+#runForLength(40)
+#turnClockwise(math.pi/2)
 
-runForLength(40)
-turnClockwise(math.pi/2)
+#runForLength(40)
+#turnClockwise(math.pi/2)
 
-runForLength(40)
-turnClockwise(math.pi/2)
+#runForLength(40)
+#turnClockwise(math.pi/2)
 
-runForLength(40)
-turnClockwise(math.pi/2)
+#runForLength(40)
+#turnClockwise(math.pi/2)
 
 
 interface.terminate()
