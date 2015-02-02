@@ -6,6 +6,8 @@ class robot:
 
 	global motors
 	global width
+	global wheel_radius
+	wheel_radius = 2.8
 	motors = [0,1]
 	width = 17.05
 
@@ -19,12 +21,12 @@ class robot:
 
 		self.interface.motorEnable(motors[0])
 		self.interface.motorEnable(motors[1])
-
+		
 		motorParams = self.interface.MotorAngleControllerParameters()
 		motorParams.maxRotationAcceleration = 6.0
 		motorParams.maxRotationSpeed = 12.0
 		motorParams.feedForwardGain = 255/17.0
-		motorParams.minPM = 36.0
+		motorParams.minPWM = 36.0
 		motorParams.pidParameters.minOutput = -255
 		motorParams.pidParameters.maxOutput = 255
 		motorParams.pidParameters.k_p = 200.0
@@ -77,22 +79,22 @@ class robot:
 
 	#distance in cm
 	def forward(self, distance):
-		self.linearMove(distance, True)
+		self.linearMove(distance)
 		print "Completed forward " + str(distance)
 
 	def backward(self, distance):
-		self.linearMove(distance, False)
+		self.linearMove(-distance)
 		print "Completed backward " + str(distance)
  
 	def turnRightRad(self, radius):
 		length = radius*width/2
-		angle = length/2.8
+		angle = length/wheel_radius
 		self.turn([angle, -angle])
 		print "Completed right turn " + str(radius)
 
 	def turnLeftRad(self, radius):
 		length = radius*width/2
-		angle = length/2.8
+		angle = length/wheel_radius
 		self.turn([-angle, angle])
 		print "Completed left turn " + str(radius)
 
@@ -120,12 +122,9 @@ class robot:
 			time.sleep(0.1)
 
 	# direction is true if forward, false if backward
-	def linearMove(self, distance, direction):
-		angle = distance/2.0
-		if direction:
-			self.interface.increaseMotorAngleReferences(motors, [angle, angle])
-		else:
-			self.interface.increaseMotorAngleReferences(motors, [-angle, -angle])
+	def linearMove(self, distance):
+		angle = distance/wheel_radius
+		self.interface.increaseMotorAngleReferences(motors, [angle, angle])
 		while not self.interface.motorAngleReferencesReached(motors):
 			motorAngles = self.interface.getMotorAngles(motors)
 			time.sleep(0.1)
