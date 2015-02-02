@@ -1,62 +1,10 @@
-import brickpi 
-import time
+from robot import robot
 import math
-import calibration
 
-interface=brickpi.Interface()
-interface.initialize()
+robot = robot()
 
-motors = [0,1]
-ffg = 255/17.0
-minPWM = 36
-kp = 200
-ki = 180
-kd = 330
-width = 17.05
+for i in range(4):
+	robot.forward(40)
+	robot.turnRight90()
 
-calibration.calibrate(interface, motors)
-
-def runForLength(length):
-	angle = length/2.8
-	interface.increaseMotorAngleReferences(motors,[angle,angle])
-
-	while not interface.motorAngleReferencesReached(motors) :
-		motorAngles = interface.getMotorAngles(motors)
-		if motorAngles :
-			pass
-			#print "Motor angles: ", motorAngles[0][0], ", ", motorAngles[1][0]
-		time.sleep(0.1)
-
-	print "Destination reached!"
-
-def turnClockwise(radius):
-	length = radius*width/2
-	angle = length/2.8
-	interface.increaseMotorAngleReferences(motors,[angle,-angle])
-	while not interface.motorAngleReferencesReached(motors) :
-		motorAngles = interface.getMotorAngles(motors)
-		if motorAngles :
-			pass
-			#print "Motor angles: ", motorAngles[0][0], ", ", motorAngles[1][0]
-		time.sleep(0.1)
-
-	print "Destination reached!"
-
-#while True:
-#	radius = float(input("Enter a  to rotate (in radius): "))
-#	turnClockwise(20.0*math.pi)
-
-runForLength(40)
-turnClockwise(math.pi/2)
-
-runForLength(40)
-turnClockwise(math.pi/2)
-
-runForLength(40)
-turnClockwise(math.pi/2)
-
-runForLength(40)
-turnClockwise(math.pi/2)
-
-
-interface.terminate()
+robot.terminate()

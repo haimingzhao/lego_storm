@@ -1,15 +1,16 @@
-import brickpi
+from robot import robot
 import time
 
-interface=brickpi.Interface()
-interface.initialize()
+robot = robot()
 
 port = 0 # port which ultrasoic sensor is plugged in to
 
-interface.sensorEnable(port, brickpi.SensorType.SENSOR_ULTRASONIC);
+robot.sensorEnableUltrasonic(port)
 
 while True:
-	usReading = interface.getSensorValue(port)
+	# usReading[0] is distance away
+	# usReading[1] is timestamp
+	usReading = robot.getSensorValue(port)
 
 	if usReading :
 		print usReading
@@ -18,4 +19,4 @@ while True:
 
 	time.sleep(0.05)
 
-interface.terminate()
+robot.terminate()
