@@ -5,11 +5,11 @@ import math
 class robot:
 
 	global motors
-	global width
+	global wheel_seperation
 	global wheel_radius
 	wheel_radius = 2.8
 	motors = [0,1]
-	width = 17.05
+	wheel_seperation = 17.05
 
 #############################################################################
 ########     MAGIC METHODS    ###############################################
@@ -29,8 +29,11 @@ class robot:
 		motorParams.minPWM = 36.0
 		motorParams.pidParameters.minOutput = -255
 		motorParams.pidParameters.maxOutput = 255
+		# proportional gain, reduces error
 		motorParams.pidParameters.k_p = 200.0
+		# integral gain, removes steady_state error
 		motorParams.pidParameters.k_i = 180
+		# differential gain, reduce settling time
 		motorParams.pidParameters.k_d = 330
 
 		self.interface.setMotorAngleControllerParameters(motors[0], motorParams)
@@ -72,6 +75,10 @@ class robot:
 	def getSensorValue(self, port):
 		return self.interface.getSensorValue(port)
 
+	def instantStop(self):
+		self.interface.setMotorPwm(0, 0)
+		self.interface.setMotorPwm(1, 0)
+
 
 #############################################################################
 ########     PUBLIC MOVEMENT METHODS    #####################################
@@ -86,23 +93,21 @@ class robot:
 		self.linearMove(-distance)
 		print "Completed backward " + str(distance)
  
-	def turnRightRad(self, radius):
-		length = radius*width/2
-		angle = length/wheel_radius
+	def turnRightRad(self, radians):
+		angle = wheelRadianTurn(radians)
 		self.turn([angle, -angle])
-		print "Completed right turn " + str(radius)
+		print "Completed right turn " + str(radians)
 
-	def turnLeftRad(self, radius):
-		length = radius*width/2
-		angle = length/wheel_radius
+	def turnLeftRad(self, radians):
+		angle = wheelRadianTurn(radians)
 		self.turn([-angle, angle])
-		print "Completed left turn " + str(radius)
+		print "Completed left turn " + str(radians)
 
 	def turnRightDeg(self, degrees):
-		self.turnRightRad(degrees * math.pi / 180)
+		self.turnRightRad(degreeToRad(degrees))
 
 	def turnLeftDeg(self, degrees):
-		self.turnLeftRad(degrees * math.pi / 180)
+		self.turnLeftRad(degreeToRad(degrees))
 
 	def turnRight90(self):
 		self.turnRightRad(math.pi/2)	
@@ -114,6 +119,12 @@ class robot:
 #############################################################################
 ########     PRIVATE METHODS    #############################################
 #############################################################################
+
+	def wheelRadianTurn(radians):
+		return (radians * wheel_seperation) / (2 * wheel_radius)
+
+	def degreeToRad(degree):
+		return degree * math.pi / 180
 
 	def turn(self, angles):
 		self.interface.increaseMotorAngleReferences(motors, angles)
