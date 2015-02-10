@@ -77,25 +77,27 @@ class robot:
 ########     PUBLIC MOVEMENT METHODS    #####################################
 #############################################################################
 
+### WARNING: MOTORS FACE THE WRONG WAY ###
+
 	#distance in cm
 	def forward(self, distance):
-		self.linearMove(distance)
+		self.linearMove(-distance)
 		print "Completed forward " + str(distance)
 
 	def backward(self, distance):
-		self.linearMove(-distance)
+		self.linearMove(distance)
 		print "Completed backward " + str(distance)
  
 	def turnRightRad(self, radius):
 		length = radius*width/2
 		angle = length/wheel_radius
-		self.turn([angle, -angle])
+		self.turn([-angle, angle])
 		print "Completed right turn " + str(radius)
 
 	def turnLeftRad(self, radius):
 		length = radius*width/2
 		angle = length/wheel_radius
-		self.turn([-angle, angle])
+		self.turn([angle, -angle])
 		print "Completed left turn " + str(radius)
 
 	def turnRightDeg(self, degrees):
