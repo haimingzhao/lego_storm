@@ -25,13 +25,13 @@ class robot:
 		motorParams = self.interface.MotorAngleControllerParameters()
 		motorParams.maxRotationAcceleration = 6.0
 		motorParams.maxRotationSpeed = 12.0
-		motorParams.feedForwardGain = 255/17.0
-		motorParams.minPWM = 36.0
+		motorParams.feedForwardGain = 255/10.0
+		motorParams.minPWM = 39
 		motorParams.pidParameters.minOutput = -255
 		motorParams.pidParameters.maxOutput = 255
-		motorParams.pidParameters.k_p = 200.0
-		motorParams.pidParameters.k_i = 180
-		motorParams.pidParameters.k_d = 330
+		motorParams.pidParameters.k_p = 350.0
+		motorParams.pidParameters.k_i = 650
+		motorParams.pidParameters.k_d = 50
 
 		self.interface.setMotorAngleControllerParameters(motors[0], motorParams)
 		self.interface.setMotorAngleControllerParameters(motors[1], motorParams)
