@@ -7,11 +7,13 @@ class robot:
 	global wheel_motors
 	global wheel_seperation
 	global wheel_radius
-	global sonarMotor
+	global sonar_motor
+	global all_verbose
 	wheel_radius = 2.8
 	wheel_motors = [0,1]
 	wheel_seperation = 17.05
-	sonarMotor = 2
+	sonar_motor = 2
+	all_verbose = False
 
 #############################################################################
 ########     MAGIC METHODS    ###############################################
@@ -23,7 +25,7 @@ class robot:
 
 		self.interface.motorEnable(wheel_motors[0])
 		self.interface.motorEnable(wheel_motors[1])
-		#self.interface.motorEnable(sonarMotor)
+		#self.interface.motorEnable(sonar_motor)
 		
 		motorParams = self.interface.MotorAngleControllerParameters()
 		motorParams.maxRotationAcceleration = 6.0
@@ -45,7 +47,7 @@ class robot:
 
 		self.interface.setMotorAngleControllerParameters(wheel_motors[0], motorParams)
 		self.interface.setMotorAngleControllerParameters(wheel_motors[1], motorParams)
-		self.interface.setMotorAngleControllerParameters(sonarMotor. motorParams)
+		self.interface.setMotorAngleControllerParameters(sonar_motor. motorParams)
 	
 
 #############################################################################
@@ -83,31 +85,34 @@ class robot:
 	def getSensorValue(self, port):
 		return self.interface.getSensorValue(port)
 
+	def setAllVerbose(self, value):
+		all_verbose = value
+
 
 #############################################################################
 ########     PUBLIC MOVEMENT METHODS    #####################################
 #############################################################################
 
 	#distance in cm
-	def forward(self, distance):
+	def forward(self, distance, verbose=False):
 		self.linearMove(-distance)
-		print "Completed forward " + str(distance)
+		print "Completed forward " + str(distance) if verbose or all_verbose
 
-	def backward(self, distance):
+	def backward(self, distance, verbose=False):
 		self.linearMove(distance)
-		print "Completed backward " + str(distance)
+		print "Completed backward " + str(distance) if verbose or all_verbose
  
-	def turnRightRad(self, radius):
+	def turnRightRad(self, radius, verbose=False):
 		length = radius*width/2
 		angle = length/wheel_radius
 		self.turn([-angle, angle])
-		print "Completed right turn " + str(radius)
+		print "Completed right turn " + str(radius) if verbose or all_verbose
 
-	def turnLeftRad(self, radius):
+	def turnLeftRad(self, radius, verbose=False):
 		length = radius*width/2
 		angle = length/wheel_radius
 		self.turn([angle, -angle])
-		print "Completed left turn " + str(radius)
+		print "Completed left turn " + str(radius) if verbose or all_verbose
 
 	def turnRightDeg(self, degrees):
 		self.turnRightRad(degreeToRad(degrees))
@@ -121,9 +126,10 @@ class robot:
 	def turnLeft90(self):
 		self.turnLeftRad(math.pi/2)
 
-	def instantStop(self):
+	def instantStop(self, verbose=False):
 		self.interface.setMotorPwm(0, 0)
 		self.interface.setMotorPwm(1, 0)
+		print "Instant stop!!!" if verbose or all_verbose
 
 
 #############################################################################
