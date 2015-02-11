@@ -4,12 +4,14 @@ import math
 
 class robot:
 
-	global motors
+	global wheel_motors
 	global wheel_seperation
 	global wheel_radius
+	global sonarMotor
 	wheel_radius = 2.8
-	motors = [0,1]
+	wheel_motors = [0,1]
 	wheel_seperation = 17.05
+	sonarMotor = 2
 
 #############################################################################
 ########     MAGIC METHODS    ###############################################
@@ -19,8 +21,9 @@ class robot:
 		self.interface = brickpi.Interface()
 		self.interface.initialize()
 
-		self.interface.motorEnable(motors[0])
-		self.interface.motorEnable(motors[1])
+		self.interface.motorEnable(wheel_motors[0])
+		self.interface.motorEnable(wheel_motors[1])
+		#self.interface.motorEnable(sonarMotor)
 		
 		motorParams = self.interface.MotorAngleControllerParameters()
 		motorParams.maxRotationAcceleration = 6.0
@@ -40,8 +43,9 @@ class robot:
 		# differential gain, reduce settling time
 		motorParams.pidParameters.k_d = 330
 
-		self.interface.setMotorAngleControllerParameters(motors[0], motorParams)
-		self.interface.setMotorAngleControllerParameters(motors[1], motorParams)
+		self.interface.setMotorAngleControllerParameters(wheel_motors[0], motorParams)
+		self.interface.setMotorAngleControllerParameters(wheel_motors[1], motorParams)
+		self.interface.setMotorAngleControllerParameters(sonarMotor. motorParams)
 	
 
 #############################################################################
@@ -79,16 +83,10 @@ class robot:
 	def getSensorValue(self, port):
 		return self.interface.getSensorValue(port)
 
-	def instantStop(self):
-		self.interface.setMotorPwm(0, 0)
-		self.interface.setMotorPwm(1, 0)
-
 
 #############################################################################
 ########     PUBLIC MOVEMENT METHODS    #####################################
 #############################################################################
-
-### WARNING: MOTORS FACE THE WRONG WAY ###
 
 	#distance in cm
 	def forward(self, distance):
@@ -123,6 +121,23 @@ class robot:
 	def turnLeft90(self):
 		self.turnLeftRad(math.pi/2)
 
+	def instantStop(self):
+		self.interface.setMotorPwm(0, 0)
+		self.interface.setMotorPwm(1, 0)
+
+
+#############################################################################
+########     PUBLIC SENSOR METHODS    #######################################
+#############################################################################
+
+	def sonarFront(self):
+		pass
+
+	def sonarRightFollow(self):
+		pass
+
+	def sonarLeftFollow(self):
+		pass
 
 #############################################################################
 ########     PRIVATE METHODS    #############################################
@@ -135,17 +150,17 @@ class robot:
 		return degree * math.pi / 180
 
 	def turn(self, angles):
-		self.interface.increaseMotorAngleReferences(motors, angles)
-		while not self.interface.motorAngleReferencesReached(motors):
-			motorAngles = self.interface.getMotorAngles(motors)
+		self.interface.increaseMotorAngleReferences(wheel_motors, angles)
+		while not self.interface.motorAngleReferencesReached(wheel_motors):
+			motorAngles = self.interface.getMotorAngles(wheel_motors)
 			time.sleep(0.1)
 
 	# direction is true if forward, false if backward
 	def linearMove(self, distance):
 		angle = distance/wheel_radius
-		self.interface.increaseMotorAngleReferences(motors, [angle, angle])
-		while not self.interface.motorAngleReferencesReached(motors):
-			motorAngles = self.interface.getMotorAngles(motors)
+		self.interface.increaseMotorAngleReferences(wheel_motors, [angle, angle])
+		while not self.interface.motorAngleReferencesReached(wheel_motors):
+			motorAngles = self.interface.getMotorAngles(wheel_motors)
 			time.sleep(0.1)
 
 
