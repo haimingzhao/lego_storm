@@ -4,14 +4,34 @@ import math
 
 class robot:
 
+	# WARNING: IT APPEARS SENSOR PORTS 4 & 5 ARE BROKEN
+	# ALSO SEE MAPPINGS BELOW AS THEY ARE WRONG
+	# S1 => port 4 => BROKEN
+	# S2 => port 1
+	# S3 => port 2
+	# S4 => port 3
+	# S5 => port 5 => BROKEN
+
+	global wheel_radius
+	global wheel_motors
+	global wheel_separation
+	global sonar_motor
+	global all_verbose
+	global right_touch
+	global left_touch
+	global sonar
+	global bumper_enabled
+	global in_recovery
 	wheel_radius = 2.8
 	wheel_motors = [0,1]
-	wheel_seperation = 17.05
+	wheel_separation = 17.05
 	sonar_motor = 2
 	all_verbose = True
-	right_touch = 4
-	left_touch = 3
-	sonar = 5
+	right_touch = 3
+	left_touch = 2
+	#sonar = 5
+	bumper_enabled = False
+	in_recovery = False
 
 #############################################################################
 ########     MAGIC METHODS    ###############################################
@@ -42,7 +62,7 @@ class robot:
 		motorParams.pidParameters.k_d = 160
 
 		self.setMotorAngleControllerParameters(wheel_motors[0], motorParams)
-		self.etMotorAngleControllerParameters(wheel_motors[1], motorParams)
+		self.setMotorAngleControllerParameters(wheel_motors[1], motorParams)
 		self.setMotorAngleControllerParameters(sonar_motor, motorParams)
 
 #############################################################################
@@ -168,23 +188,23 @@ class robot:
 
 	#distance in cm
 	def forward(self, distance, verbose=False):
-		self.linearMove(-distance)
+		self.linearMove(distance)
 		if verbose or all_verbose: print "Completed forward " + str(distance)
 
 	def backward(self, distance, verbose=False):
-		self.linearMove(distance)
+		self.linearMove(-distance)
 		if verbose or all_verbose: print "Completed backward " + str(distance)
  
-	def turnRightRad(self, radius):
-		length = radius*wheel_separation/2
-		angle = length/wheel_radius
-		self.turn([-angle, angle])
-		if verbose or all_verbose: print "Completed right turn " + str(radius)
-
-	def turnLeftRad(self, radius):
+	def turnRightRad(self, radius, verbose=False):
 		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([angle, -angle])
+		if verbose or all_verbose: print "Completed right turn " + str(radius)
+
+	def turnLeftRad(self, radius, verbose=False):
+		length = radius*wheel_separation/2
+		angle = length/wheel_radius
+		self.turn([-angle, angle])
 		if verbose or all_verbose: print "Completed left turn " + str(radius)
 
 	def turnRightDeg(self, degrees):
@@ -202,31 +222,36 @@ class robot:
 	def instantStop(self, verbose=False):
 		self.setMotorPwm(0, 0)
 		self.setMotorPwm(1, 0)
-		if verbose or all_verbose: print "Instant stop!!!
+		if verbose or all_verbose: print "Instant stop!!!"
 
 
 #############################################################################
 ########     PUBLIC SENSOR METHODS    #######################################
 #############################################################################
 
-	def enableBumper(self):
+	def enableBumper(self, verbose=False):
+		global bumper_enabled
 		self.sensorEnableTouch(left_touch)
 		self.sensorEnableTouch(right_touch)
+		if verbose or all_verbose: print "Bumper Enabled"
+		bumper_enabled = True
 
 	def enableSonar(self):
 		self.sensorEnableUltrasonic(sonar)
 
 	def disableBumper(self):
+		global bumper_enabled
 		self.sensorDisable(left_touch)
 		self.sensorDisable(right_touch)
+		bumper_enabled = False
 
 	def disableSonar(self):
 		self.sensorDisable(sonar)
 
 	def sonarTurnRight(self, degrees):
-		self.increaseMotorAngleReference(sonar_motor, angles)
-                while not self.motorAngleReferencesReached(wheel_motors):
-                        motorAngles = self.getMotorAngles(wheel_motors)
+		self.increaseMotorAngleReference(sonar_motor, self.degreeToRad(degrees))
+                while not self.motorAngleReferenceReached(sonar_motor):
+                        sonarAngle = self.getMotorAngle(sonar_motor)
                         time.sleep(0.1)
 
 	def sonarFront(self):
@@ -238,6 +263,27 @@ class robot:
 	def sonarLeftFollow(self):
 		pass
 
+	def check_bumper(self):
+		return self.getSensorValue(left_touch)[0] or self.getSensorValue(right_touch)[0]
+
+	def recover(self):
+		global in_recovery
+		left = self.getSensorValue(left_touch)[0]
+		right = self.getSensorValue(right_touch)[0]
+		in_recovery = True
+		self.backward(10)
+		if left and right:
+			print "Recovering from both"
+			self.turnRight90()
+		elif left:
+			print "Recovering from left"
+			self.turnRight90()
+		elif right:
+			print "Recovering from right"
+			self.turnLeft90()
+		in_recovery = False
+
+
 #############################################################################
 ########     PRIVATE METHODS    #############################################
 #############################################################################
@@ -245,7 +291,7 @@ class robot:
 	def wheelRadianTurn(radians):
 		return (radians * wheel_seperation) / (2 * wheel_radius)
 
-	def degreeToRad(degree):
+	def degreeToRad(self, degree):
 		return degree * math.pi / 180
 
 	def turn(self, angles):
@@ -259,6 +305,10 @@ class robot:
 		angle = distance/wheel_radius
 		self.increaseMotorAngleReferences(wheel_motors, [angle, angle])
 		while not self.motorAngleReferencesReached(wheel_motors):
+			if bumper_enabled and self.check_bumper() and not in_recovery:
+				self.instantStop()
+				self.recover()
+				break
 			motorAngles = self.getMotorAngles(wheel_motors)
 			time.sleep(0.1)
 

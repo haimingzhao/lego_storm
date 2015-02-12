@@ -2,9 +2,8 @@ from robot import robot
 
 robot = robot()
 
-robot.enableSonar()
+robot.enableBumper()
 
-robot.sonarTurnRight(45)
+robot.forward(2000)
 
 robot.terminate()
-
