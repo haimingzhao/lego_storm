@@ -22,6 +22,7 @@ class robot:
 	global sonar
 	global bumper_enabled
 	global in_recovery
+	global wall_follow_distance
 	wheel_radius = 2.8
 	wheel_motors = [0,1]
 	wheel_separation = 17.05
@@ -29,9 +30,10 @@ class robot:
 	all_verbose = True
 	right_touch = 3
 	left_touch = 2
-	#sonar = 5
+	sonar = 1
 	bumper_enabled = False
 	in_recovery = False
+	wall_follow_distance = 30
 
 #############################################################################
 ########     MAGIC METHODS    ###############################################
@@ -208,10 +210,10 @@ class robot:
 		if verbose or all_verbose: print "Completed left turn " + str(radius)
 
 	def turnRightDeg(self, degrees):
-		self.turnRightRad(degreeToRad(degrees))
+		self.turnRightRad(self.degreeToRad(degrees))
 
 	def turnLeftDeg(self, degrees):
-		self.turnLeftRad(degreeToRad(degrees))
+		self.turnLeftRad(self.degreeToRad(degrees))
 
 	def turnRight90(self):
 		self.turnRightRad(math.pi/2)	
@@ -229,6 +231,32 @@ class robot:
 ########     PUBLIC SENSOR METHODS    #######################################
 #############################################################################
 
+	def setWallFollowDistance(self, distance):
+		global wall_follow_distance
+		wall_follow_distance = distance
+
+	def getWallFollowDistance(self):
+		return wall_follow_distance
+
+	global pre_dis
+	pre_dis = -1
+	def wallFollow(self):
+		while True:
+			self.setMotorRotationSpeedReferences([0,1], [150, 150])
+			while True:
+				dis = self.getSensorValue(sonar)
+				print dis
+				if dis > wall_follow_distance or dis < wall_follow_distance:
+					self.instantStop()
+					break
+				time.sleep(0.1)
+			if dis > wall_follow_distance:
+				self.turnLeftDeg(5)
+				self.forward(5)
+			else:
+				self.turnRightDeg(5)
+				self.forward(5)
+
 	def enableBumper(self, verbose=False):
 		global bumper_enabled
 		self.sensorEnableTouch(left_touch)
@@ -236,8 +264,9 @@ class robot:
 		if verbose or all_verbose: print "Bumper Enabled"
 		bumper_enabled = True
 
-	def enableSonar(self):
+	def enableSonar(self, verbose=False):
 		self.sensorEnableUltrasonic(sonar)
+		if verbose or all_verbose: print "Sonar Enabled"
 
 	def disableBumper(self):
 		global bumper_enabled
