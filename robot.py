@@ -4,16 +4,14 @@ import math
 
 class robot:
 
-	global wheel_motors
-	global wheel_seperation
-	global wheel_radius
-	global sonar_motor
-	global all_verbose
 	wheel_radius = 2.8
 	wheel_motors = [0,1]
 	wheel_seperation = 17.05
 	sonar_motor = 2
 	all_verbose = True
+	right_touch = 4
+	left_touch = 3
+	sonar = 5
 
 #############################################################################
 ########     MAGIC METHODS    ###############################################
@@ -22,14 +20,11 @@ class robot:
 	def __init__(self):
 		self.interface = brickpi.Interface()
 
-		# starts separate thread that continuously polls the activated sensors
-		# as well as controls the motors that were started
-		self.interface.initialize()
+		self.initialize()
 
-		# activate individual sensors
-		self.interface.motorEnable(wheel_motors[0])
-		self.interface.motorEnable(wheel_motors[1])
-		self.interface.motorEnable(sonar_motor)
+		self.motorEnable(wheel_motors[0])
+		self.motorEnable(wheel_motors[1])
+		self.motorEnable(sonar_motor)
 		
 		motorParams = self.interface.MotorAngleControllerParameters()
 		motorParams.maxRotationAcceleration = 6.0
@@ -39,9 +34,6 @@ class robot:
 		motorParams.pidParameters.minOutput = -255
 		motorParams.pidParameters.maxOutput = 255
 
-		#motorParams.pidParameters.k_p = 350.0
-		#motorParams.pidParameters.k_i = 650
-		#motorParams.pidParameters.k_d = 50
 		# proportional gain, reduces error
 		motorParams.pidParameters.k_p = 450.0
 		# integral gain, removes steady_state error
@@ -49,15 +41,103 @@ class robot:
 		# differential gain, reduce settling time
 		motorParams.pidParameters.k_d = 160
 
-		self.interface.setMotorAngleControllerParameters(wheel_motors[0], motorParams)
-		self.interface.setMotorAngleControllerParameters(wheel_motors[1], motorParams)
-		self.interface.setMotorAngleControllerParameters(sonar_motor, motorParams)
-	
+		self.setMotorAngleControllerParameters(wheel_motors[0], motorParams)
+		self.etMotorAngleControllerParameters(wheel_motors[1], motorParams)
+		self.setMotorAngleControllerParameters(sonar_motor, motorParams)
 
 #############################################################################
-########     PUBLIC INTERFACE METHODS    ####################################
+########     PUBLIC BRICKPI INTERFACE METHODS    ############################
 #############################################################################
 
+	# this starts a separate thread that continuously polls the activated sensors
+	# as well as controls the motors that were started
+	def initialize(self):
+		self.interface.initialize()
+
+	# softly stop all motors and sensors, stop the polling and control thread
+	def terminate(self):
+		self.interface.terminate()
+
+	# immediately stop all motors, stop the polling and control thread
+	# BAD FOR HARDWARE - DO NOT DO THIS!!!!!
+	def emergencyStop(self):
+		self.interface.emergencyStop()
+
+	# start individual motors
+	def motorEnable(self, port):
+		self.interface.motorEnable(port)
+
+	# stop individual motors
+	def motorDisable(self, port):
+		self.interface.motorDisable(port)
+
+	# activate individual sensors
+	def sensorEnable(self, port, sensor_type):
+		self.interface.sensorEnable(port, sensor_type)
+
+	# deactivate individual sensors
+	def sensorDisable(self, port):
+		self.interface.sensorDisable(port)
+
+	# thread safe access to sensor values
+	def getSensorValue(self, port):
+		return self.interface.getSensorValue(port)
+
+	# low-level motor interface -- overrides controller
+	# useful for instant stop of motor
+	def setMotorPwm(self, port, pwm):
+		self.interface.setMotorPwm(port, pwm)
+
+	# set the controller parameters to non-default values
+	def setMotorAngleControllerParameters(self, motor_port, motor_params):
+		self.interface.setMotorAngleControllerParameters(motor_port, motor_params)
+
+	# set a controller speed reference -- overrides low-level setMotorPwm
+	def setMotorRotationSpeedReference(self, motor, speed):
+		self.interface.setMotorRotationSpeedReference(motor, speed)
+
+	# set controller speed references -- overrides low-level setMotorPwm.
+	# this version guarantees synchronous operation
+	def setMotorRotationSpeedReferences(self, motors, speeds):
+		self.interface.setMotorRotationSpeedReferences(motors, speeds)
+
+	# figure out, if the set speed reference has been reached
+	def motorRotationSpeedReferenceReached(self, motor):
+		return self.interface.motorRotationSpeedReferenceReached(motor)
+
+	# set a controller angle reference
+	def setMotorAngleReference(self, motor, angle):
+		self.interface.setMotorAngleReference(motor, angle)
+
+	# set controller speed references
+	# this version guarantees synchronous
+	def setMotorAnglesReferences(self, motors, angles):
+		self.interface.setMotorAnglesReferences(motors, angles)
+
+	# increase a controller angle reference
+	def increaseMotorAngleReference(self, motor, angle):
+		self.interface.increaseMotorAngleReference(motor, angle)
+
+	# increase controller speed references
+	# this version guarantees synchronous
+	def increaseMotorAngleReferences(self, motors, angles):
+		self.interface.increaseMotorAngleReferences(motors, angles)
+
+	# query the current (actual) motor speeds
+	def getMotorAngles(self, motors):
+		return self.interface.getMotorAngles(motors)
+
+	# query the current (actual) motor speed
+	def getMotorAngle(self, motor):
+		return self.interface.getMotorAngle(motor)
+
+	# figure out, if the set angle reference has been reached
+	def motorAngleReferencesReached(self, motors):
+		return self.interface.motorAngleReferencesReached(motors)
+
+	# figure out, if the set angle reference has been reached
+	def motorAngleReferenceReached(self, motor):
+		return self.interface.motorAngleReferenceReached(motor)
 
 	def startLogging(self, file_name):
 		self.interface.startLogging(file_name)
@@ -65,34 +145,22 @@ class robot:
 	def stopLogging(self):
 		self.interface.stopLogging()
 
-	# softly stop all motors and sensors, stop the polling and control threads
-	def terminate(self):
-		self.interface.terminate()
-
-	def setMotorRotationSpeedReferences(self, motor, speed):
-		self.interface.setMotorRotationSpeedReferences(motor, speed)
-
-	def motorAngleReferencesReached(self, motors):
-		return self.interface.motorAngleReferencesReached(motors)
-
-	def increaseMotorAngleReferences(self, motors, angles):
-		self.interface.increaseMotorAngleReferences(motors, angles)
-
-	def getMotorAngles(self, motors):
-		return self.interface.getMotorAngles(motors)
-
 	def sensorEnableUltrasonic(self, port):
-		self.interface.sensorEnable(port, brickpi.SensorType.SENSOR_ULTRASONIC)
+		self.sensorEnable(port, brickpi.SensorType.SENSOR_ULTRASONIC)
 
 	def sensorEnableTouch(self, port):
-		self.interface.sensorEnable(port, brickpi.SensorType.SENSOR_TOUCH)
+		self.sensorEnable(port, brickpi.SensorType.SENSOR_TOUCH)
 
-	def getSensorValue(self, port):
-		return self.interface.getSensorValue(port)
+
+#############################################################################
+########     ENVIRONMENT CONTROL METHODS    #################################
+#############################################################################
 
 	def setAllVerbose(self, value):
 		all_verbose = value
 
+	def getAllVerbose(self):
+		return all_verbose
 
 #############################################################################
 ########     PUBLIC MOVEMENT METHODS    #####################################
@@ -132,24 +200,33 @@ class robot:
 		self.turnLeftRad(math.pi/2)
 
 	def instantStop(self, verbose=False):
-		self.interface.setMotorPwm(0, 0)
-		self.interface.setMotorPwm(1, 0)
-		if verbose or all_verbose: print "Instant stop!!!"
-
-	# immediately stop all motors, stop the polling and control thread
-	# BAD FOR HARDWARE - DO NOT USE!!!
-	def emergencyStop(self):
-		self.interface.emergencyStop()
+		self.setMotorPwm(0, 0)
+		self.setMotorPwm(1, 0)
+		if verbose or all_verbose: print "Instant stop!!!
 
 
 #############################################################################
 ########     PUBLIC SENSOR METHODS    #######################################
 #############################################################################
 
+	def enableBumper(self):
+		self.sensorEnableTouch(left_touch)
+		self.sensorEnableTouch(right_touch)
+
+	def enableSonar(self):
+		self.sensorEnableUltrasonic(sonar)
+
+	def disableBumper(self):
+		self.sensorDisable(left_touch)
+		self.sensorDisable(right_touch)
+
+	def disableSonar(self):
+		self.sensorDisable(sonar)
+
 	def sonarTurnRight(self, degrees):
-		self.interface.increaseMotorAngleReference(sonar_motor, angles)
-                while not self.interface.motorAngleReferencesReached(wheel_motors):
-                        motorAngles = self.interface.getMotorAngles(wheel_motors)
+		self.increaseMotorAngleReference(sonar_motor, angles)
+                while not self.motorAngleReferencesReached(wheel_motors):
+                        motorAngles = self.getMotorAngles(wheel_motors)
                         time.sleep(0.1)
 
 	def sonarFront(self):
@@ -172,17 +249,17 @@ class robot:
 		return degree * math.pi / 180
 
 	def turn(self, angles):
-		self.interface.increaseMotorAngleReferences(wheel_motors, angles)
-		while not self.interface.motorAngleReferencesReached(wheel_motors):
-			motorAngles = self.interface.getMotorAngles(wheel_motors)
+		self.increaseMotorAngleReferences(wheel_motors, angles)
+		while not self.motorAngleReferencesReached(wheel_motors):
+			motorAngles = self.getMotorAngles(wheel_motors)
 			time.sleep(0.1)
 
 	# direction is true if forward, false if backward
 	def linearMove(self, distance):
 		angle = distance/wheel_radius
-		self.interface.increaseMotorAngleReferences(wheel_motors, [angle, angle])
-		while not self.interface.motorAngleReferencesReached(wheel_motors):
-			motorAngles = self.interface.getMotorAngles(wheel_motors)
+		self.increaseMotorAngleReferences(wheel_motors, [angle, angle])
+		while not self.motorAngleReferencesReached(wheel_motors):
+			motorAngles = self.getMotorAngles(wheel_motors)
 			time.sleep(0.1)
 
 
