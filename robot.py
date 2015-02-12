@@ -13,7 +13,7 @@ class robot:
 	wheel_motors = [0,1]
 	wheel_seperation = 17.05
 	sonar_motor = 2
-	all_verbose = False
+	all_verbose = True
 
 #############################################################################
 ########     MAGIC METHODS    ###############################################
@@ -25,13 +25,13 @@ class robot:
 
 		self.interface.motorEnable(wheel_motors[0])
 		self.interface.motorEnable(wheel_motors[1])
-		#self.interface.motorEnable(sonar_motor)
+		self.interface.motorEnable(sonar_motor)
 		
 		motorParams = self.interface.MotorAngleControllerParameters()
 		motorParams.maxRotationAcceleration = 6.0
 		motorParams.maxRotationSpeed = 12.0
-		motorParams.feedForwardGain = 255/10.0
-		motorParams.minPWM = 39
+		motorParams.feedForwardGain = 255/22.0
+		motorParams.minPWM = 37.5
 		motorParams.pidParameters.minOutput = -255
 		motorParams.pidParameters.maxOutput = 255
 
@@ -39,15 +39,15 @@ class robot:
 		#motorParams.pidParameters.k_i = 650
 		#motorParams.pidParameters.k_d = 50
 		# proportional gain, reduces error
-		motorParams.pidParameters.k_p = 200.0
+		motorParams.pidParameters.k_p = 450.0
 		# integral gain, removes steady_state error
-		motorParams.pidParameters.k_i = 180
+		motorParams.pidParameters.k_i = 700
 		# differential gain, reduce settling time
-		motorParams.pidParameters.k_d = 330
+		motorParams.pidParameters.k_d = 160
 
 		self.interface.setMotorAngleControllerParameters(wheel_motors[0], motorParams)
 		self.interface.setMotorAngleControllerParameters(wheel_motors[1], motorParams)
-		self.interface.setMotorAngleControllerParameters(sonar_motor. motorParams)
+		self.interface.setMotorAngleControllerParameters(sonar_motor, motorParams)
 	
 
 #############################################################################
@@ -102,14 +102,14 @@ class robot:
 		self.linearMove(distance)
 		print "Completed backward " + str(distance) if verbose or all_verbose
  
-	def turnRightRad(self, radius, verbose=False):
-		length = radius*width/2
+	def turnRightRad(self, radius):
+		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([-angle, angle])
 		print "Completed right turn " + str(radius) if verbose or all_verbose
 
-	def turnLeftRad(self, radius, verbose=False):
-		length = radius*width/2
+	def turnLeftRad(self, radius):
+		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([angle, -angle])
 		print "Completed left turn " + str(radius) if verbose or all_verbose
