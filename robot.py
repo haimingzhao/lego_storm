@@ -21,8 +21,12 @@ class robot:
 
 	def __init__(self):
 		self.interface = brickpi.Interface()
+
+		# starts separate thread that continuously polls the activated sensors
+		# as well as controls the motors that were started
 		self.interface.initialize()
 
+		# activate individual sensors
 		self.interface.motorEnable(wheel_motors[0])
 		self.interface.motorEnable(wheel_motors[1])
 		self.interface.motorEnable(sonar_motor)
@@ -61,6 +65,7 @@ class robot:
 	def stopLogging(self):
 		self.interface.stopLogging()
 
+	# softly stop all motors and sensors, stop the polling and control threads
 	def terminate(self):
 		self.interface.terminate()
 
@@ -96,23 +101,23 @@ class robot:
 	#distance in cm
 	def forward(self, distance, verbose=False):
 		self.linearMove(-distance)
-		print "Completed forward " + str(distance) if verbose or all_verbose
+		if verbose or all_verbose: print "Completed forward " + str(distance)
 
 	def backward(self, distance, verbose=False):
 		self.linearMove(distance)
-		print "Completed backward " + str(distance) if verbose or all_verbose
+		if verbose or all_verbose: print "Completed backward " + str(distance)
  
 	def turnRightRad(self, radius):
 		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([-angle, angle])
-		print "Completed right turn " + str(radius) if verbose or all_verbose
+		if verbose or all_verbose: print "Completed right turn " + str(radius)
 
 	def turnLeftRad(self, radius):
 		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([angle, -angle])
-		print "Completed left turn " + str(radius) if verbose or all_verbose
+		if verbose or all_verbose: print "Completed left turn " + str(radius)
 
 	def turnRightDeg(self, degrees):
 		self.turnRightRad(degreeToRad(degrees))
@@ -129,12 +134,23 @@ class robot:
 	def instantStop(self, verbose=False):
 		self.interface.setMotorPwm(0, 0)
 		self.interface.setMotorPwm(1, 0)
-		print "Instant stop!!!" if verbose or all_verbose
+		if verbose or all_verbose: print "Instant stop!!!"
+
+	# immediately stop all motors, stop the polling and control thread
+	# BAD FOR HARDWARE - DO NOT USE!!!
+	def emergencyStop(self):
+		self.interface.emergencyStop()
 
 
 #############################################################################
 ########     PUBLIC SENSOR METHODS    #######################################
 #############################################################################
+
+	def sonarTurnRight(self, degrees):
+		self.interface.increaseMotorAngleReference(sonar_motor, angles)
+                while not self.interface.motorAngleReferencesReached(wheel_motors):
+                        motorAngles = self.interface.getMotorAngles(wheel_motors)
+                        time.sleep(0.1)
 
 	def sonarFront(self):
 		pass
