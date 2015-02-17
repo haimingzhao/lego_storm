@@ -2,9 +2,11 @@ from robot import robot
 import math
 
 #[x,y,theta]
-startPos = [0,0,0]
+startPos = [[0,0,0]]
 
 NUMBER_OF_PARTICLES = 100
+
+particles = startPos * NUMBER_OF_PARTICLES
 
 for i in range(4):
     robot.forward(10)
