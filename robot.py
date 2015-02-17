@@ -1,6 +1,7 @@
 import brickpi
 import time
 import math
+from localisation import localisation
 
 class robot:
 
@@ -39,7 +40,7 @@ class robot:
 ########     MAGIC METHODS    ###############################################
 #############################################################################
 
-	def __init__(self):
+	def __init__(self, draw=False, record=False):
 		self.interface = brickpi.Interface()
 
 		self.initialize()
@@ -66,6 +67,9 @@ class robot:
 		self.setMotorAngleControllerParameters(wheel_motors[0], motorParams)
 		self.setMotorAngleControllerParameters(wheel_motors[1], motorParams)
 		self.setMotorAngleControllerParameters(sonar_motor, motorParams)
+
+		# initialise localisation
+		self.loc = localisation(draw, record)
 
 #############################################################################
 ########     PUBLIC BRICKPI INTERFACE METHODS    ############################
@@ -191,22 +195,26 @@ class robot:
 	#distance in cm
 	def forward(self, distance, verbose=False):
 		self.linearMove(distance)
+		self.loc.loc_distance(distance)
 		if verbose or all_verbose: print "Completed forward " + str(distance)
 
 	def backward(self, distance, verbose=False):
 		self.linearMove(-distance)
+		self.loc.loc_distance(-distance)
 		if verbose or all_verbose: print "Completed backward " + str(distance)
  
 	def turnRightRad(self, radius, verbose=False):
 		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([angle, -angle])
+		self.loc.loc_rotation(angle)
 		if verbose or all_verbose: print "Completed right turn " + str(radius)
 
 	def turnLeftRad(self, radius, verbose=False):
 		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([-angle, angle])
+		self.loc.loc_rotation(-angle)
 		if verbose or all_verbose: print "Completed left turn " + str(radius)
 
 	def turnRightDeg(self, degrees):
