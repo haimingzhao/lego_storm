@@ -43,6 +43,8 @@ class localisation:
 			self.record = True
 		else:
 			self.record = False
+		if drawing:
+			draw_particles(self.particles)
 
 	def draw_particles(self, particles):
 		p = self.particles
