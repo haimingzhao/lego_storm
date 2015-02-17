@@ -13,12 +13,15 @@ class localisation:
 	global ROTATION
 	global origin
 	global draw
+	global scalar
 
 	NUM_OF_PARTS = 100
 
 	X = 0
-	Y = 0
+	Y = 1
 	THETA = 2
+
+	scalar = 10
 
 	# value in cm
 	LINEAR_DISTANCE = 0.5
@@ -42,7 +45,13 @@ class localisation:
 			self.record = False
 
 	def draw_particles(self, particles):
-		print "drawParticles:" + str(particles)
+		p = self.particles
+		for a in range(NUM_OF_PARTS):
+			x = p[a][X] * scalar
+			y = p[a][Y] * scalar
+			theta = p[a][THETA]
+			p[a] = (x,y,theta)
+		print "drawParticles:" + str(p)
 
 	def draw_line(self, x1, y1, x2, y2):
 		line = (x1, y1, x2, y2)
@@ -73,13 +82,13 @@ class localisation:
 		if self.record: self.record_all += self.particles
 		for p in range(NUM_OF_PARTS):
 			self.update_particle_distance(p, d)
-		if draw: draw_particles(self.particles)
+		if draw: self.draw_particles(self.particles)
 
 	def loc_rotation(self, angle):
 		if self.record: self.record_all += self.particles
 		for p in range(NUM_OF_PARTS):
 			self.update_particle_rotation(p, angle)
-		if draw: draw_particles(self.particles)
+		if draw: self.draw_particles(self.particles)
 
 	def draw_all(self):
 		draw_particles(self.record_all)
