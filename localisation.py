@@ -14,7 +14,7 @@ class localisation:
 	global origin
 	global draw
 
-	NUM_OF_PARTS = 1
+	NUM_OF_PARTS = 100
 
 	X = 0
 	Y = 1
@@ -33,6 +33,10 @@ class localisation:
 
 	def __init__(self, drawing=False, record=False):
 		self.particles = origin * NUM_OF_PARTS
+		self.weightings = [0] * NUM_OF_PARTS
+		for i in range(NUM_OF_PARTS):
+			self.weightings[i] = 1/NUM_OF_PARTS
+		print self.weightings
 		global draw
 		draw = drawing
 		if record:
@@ -102,7 +106,14 @@ class localisation:
 		self.draw_particles(self.record_all)
 
 	def get_average(self):
-		# TO DO
-		pass
+		av_x = 0
+		av_y = 0
+		av_t = 0
+		for p in range(NUM_OF_PARTS):
+			av_x += self.weightings[p] * self.particles[p][X]
+			av_y += self.weightings[p] * self.particles[p][Y]
+			av_t += self.weightings[p] * self.particles[p][THETA]
+		return [av_x, av_y, av_t]
+
 
 
