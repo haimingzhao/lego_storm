@@ -24,9 +24,9 @@ class localisation:
 	# value in cm
 	LINEAR_DISTANCE = 0.5
 	# value in degrees
-	LINEAR_ROTATION = 0.5
+	LINEAR_ROTATION = 0.1
 	# value in degrees
-	ROTATION = 2
+	ROTATION = 1
 
 	origin = [(0,0,0)]
 
@@ -46,19 +46,24 @@ class localisation:
 		if drawing:
 			self.draw_particles(self.particles)
 
+	def norm_output(self, value):
+		if value < 0.001 and value > -0.001:
+			return 0.0
+		return value
+
 	def wrap(self, angle):
 		if angle < 0:
-			angle += 360
+			return self.wrap(angle + 360)
 		if angle > 360:
-			angle -= 360
+			return self.wrap(angle - 360)
 		return angle
 
 	def draw_particles(self, particles):
 		p = copy.deepcopy(self.particles)
-		scalar = 10
+		scalar = 5
 		for a in range(NUM_OF_PARTS):
-			x = (p[a][X] * scalar) + 100
-			y = (p[a][Y] * scalar) + 100
+			x = (p[a][X] * scalar) + 400
+			y = (p[a][Y] * scalar) + 400
 			theta = p[a][THETA]
 			p[a] = (x,y,theta)
 			#print p[a]
@@ -70,14 +75,14 @@ class localisation:
 
 	def ran_gauss(self, sigma):
 		return random.gauss(0, sigma)
+		#return 0
 
 	def update_particle_distance(self, pid, distance):
 		e = self.ran_gauss(LINEAR_DISTANCE)
 		f = self.ran_gauss(LINEAR_ROTATION)
 		x = self.particles[pid][X] + (distance+e)*math.cos(math.radians(self.particles[pid][THETA]))
 		y = self.particles[pid][Y] + (distance+e)*math.sin(math.radians(self.particles[pid][THETA]))
-		theta = self.particles[pid][THETA] + f
-		self.wrap(theta)
+		theta = self.particles[pid][THETA]
 		self.particles[pid] = (x,y,theta)
 
 	def update_particle_rotation(self, pid, angle):
@@ -85,7 +90,6 @@ class localisation:
 		x = self.particles[pid][X]
 		y = self.particles[pid][Y]
 		theta = self.particles[pid][THETA] + angle + g
-		self.wrap(theta)
 		self.particles[pid] = (x,y,theta)
 
 	def loc_distance(self, d):
@@ -113,7 +117,7 @@ class localisation:
 			av_x += self.weightings[p] * self.particles[p][X]
 			av_y += self.weightings[p] * self.particles[p][Y]
 			av_t += self.weightings[p] * self.particles[p][THETA]
-		return [av_x, av_y, av_t]
+		return [self.norm_output(av_x), self.norm_output(av_y),(av_t)]
 
 
 
