@@ -11,7 +11,7 @@ def navigateToWaypoint(x,y):
 	alpha = math.degrees(math.atan2(dy,dx))
 	beta = normalise(alpha - theta)
 	distance = math.hypot(dx, dy)
-	robot.turnLeftDeg(beta)
+	robot.turnDeg(beta)
 	robot.forward(distance,False)
 
 	print robot.get_loc().get_average()
