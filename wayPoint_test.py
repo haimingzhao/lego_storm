@@ -8,12 +8,13 @@ def navigateToWaypoint(x,y):
 	theta = particle[2]
 	dx = (100 *x) - currentX
 	dy = (100 *y) - currentY
-	alpha = math.atan2(dy,dx)
+	alpha = math.degrees(math.atan2(dy,dx))
 	beta = normalise(alpha - theta)
 	distance = math.hypot(dx, dy)
+	
 	robot.turnDeg(beta)
 	robot.forward(distance,False)
-	print robot.get_loc().get_average()
+	
 
 def normalise(angle):
 	if angle < -180:
@@ -23,6 +24,7 @@ def normalise(angle):
 	else :
 		return angle
 robot = robot()
+
 while True:
 	x,y = raw_input("Enter x and y coordinates to travel to or ctrl+c to quit").split()
 	x = float(x)
