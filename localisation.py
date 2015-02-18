@@ -33,10 +33,7 @@ class localisation:
 
 	def __init__(self, drawing=False, record=False):
 		self.particles = origin * NUM_OF_PARTS
-		self.weightings = [0] * NUM_OF_PARTS
-		for i in range(NUM_OF_PARTS):
-			self.weightings[i] = 1/NUM_OF_PARTS
-		print self.weightings
+		self.weightings = [1/NUM_OF_PARTS] * NUM_OF_PARTS
 		global draw
 		draw = drawing
 		if record:
@@ -70,8 +67,7 @@ class localisation:
 		print "drawLine:" + str(line)
 
 	def ran_gauss(self, sigma):
-		#return random.gauss(0, sigma)
-		return 0
+		return random.gauss(0, sigma)
 
 	def update_particle_distance(self, pid, distance):
 		e = self.ran_gauss(LINEAR_DISTANCE)
