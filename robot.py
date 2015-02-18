@@ -26,7 +26,7 @@ class robot:
 	global wall_follow_distance
 	wheel_radius = 2.8
 	wheel_motors = [0,1]
-	wheel_separation = 17.05
+	wheel_separation = 15.89
 	sonar_motor = 2
 	all_verbose = True
 	right_touch = 3
