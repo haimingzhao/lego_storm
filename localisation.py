@@ -34,7 +34,8 @@ class localisation:
 
 	def __init__(self, drawing=False, record=False):
 		self.particles = origin * NUM_OF_PARTS
-		self.weightings = [1/NUM_OF_PARTS] * NUM_OF_PARTS
+		weight = float(1 / float(NUM_OF_PARTS))
+		self.weightings = [weight] * NUM_OF_PARTS		
 		global draw
 		draw = drawing
 		if record:
