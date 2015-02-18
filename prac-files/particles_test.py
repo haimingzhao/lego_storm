@@ -8,10 +8,10 @@ robot = robot(True, True)
 
 l = robot.get_loc()
 
-l.draw_line(400, 400, 800, 400)
-l.draw_line(800, 400, 800, 800)
-l.draw_line(800, 800, 400, 800)
-l.draw_line(400, 800, 400, 400)
+l.draw_line(500, 500, 900, 500)
+l.draw_line(900, 500, 900, 100)
+l.draw_line(900, 100, 500, 100)
+l.draw_line(500, 100, 500, 500)
    
 for a in range(4):
     robot.forward(10)
