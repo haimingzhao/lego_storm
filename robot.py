@@ -53,16 +53,16 @@ class robot:
 		motorParams.maxRotationAcceleration = 6.0
 		motorParams.maxRotationSpeed = 12.0
 		motorParams.feedForwardGain = 255/22.0
-		motorParams.minPWM = 27
+		motorParams.minPWM = 25
 		motorParams.pidParameters.minOutput = -255
 		motorParams.pidParameters.maxOutput = 255
 
 		# proportional gain, reduces error
-		motorParams.pidParameters.k_p = 480.0
+		motorParams.pidParameters.k_p = 270.0
 		# integral gain, removes steady_state error
-		motorParams.pidParameters.k_i = 650
+		motorParams.pidParameters.k_i = 400
 		# differential gain, reduce settling time
-		motorParams.pidParameters.k_d = 250
+		motorParams.pidParameters.k_d = 160
 
 		self.setMotorAngleControllerParameters(wheel_motors[0], motorParams)
 		self.setMotorAngleControllerParameters(wheel_motors[1], motorParams)
@@ -207,21 +207,21 @@ class robot:
 		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([angle, -angle])
-		self.loc.loc_rotation(angle)
+		self.loc.loc_rotation(math.degrees(-radius))
 		if verbose or all_verbose: print "Completed right turn " + str(radius)
 
 	def turnLeftRad(self, radius, verbose=False):
 		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([-angle, angle])
-		self.loc.loc_rotation(-angle)
+		self.loc.loc_rotation(math.degrees(-radius))
 		if verbose or all_verbose: print "Completed left turn " + str(radius)
 
 	def turnRightDeg(self, degrees):
-		self.turnRightRad(self.degreeToRad(degrees))
+		self.turnRightRad(math.radians(degrees))
 
 	def turnLeftDeg(self, degrees):
-		self.turnLeftRad(self.degreeToRad(degrees))
+		self.turnLeftRad(math.radians(degrees))
 
 	def turnRight90(self):
 		self.turnRightRad(math.pi/2)	
@@ -291,21 +291,6 @@ class robot:
 	def disableSonar(self):
 		self.sensorDisable(sonar)
 
-	def sonarTurnRight(self, degrees):
-		self.increaseMotorAngleReference(sonar_motor, self.degreeToRad(degrees))
-                while not self.motorAngleReferenceReached(sonar_motor):
-                        sonarAngle = self.getMotorAngle(sonar_motor)
-                        time.sleep(0.1)
-
-	def sonarFront(self):
-		pass
-
-	def sonarRightFollow(self):
-		pass
-
-	def sonarLeftFollow(self):
-		pass
-
 	def check_bumper(self):
 		return self.getSensorValue(left_touch)[0] or self.getSensorValue(right_touch)[0]
 
@@ -339,9 +324,6 @@ class robot:
 
 	def wheelRadianTurn(radians):
 		return (radians * wheel_seperation) / (2 * wheel_radius)
-
-	def degreeToRad(self, degree):
-		return degree * math.pi / 180
 
 	def turn(self, angles):
 		self.increaseMotorAngleReferences(wheel_motors, angles)

@@ -1,8 +1,8 @@
 import sys
 sys.path.insert(0, '../')
-from robot import robot
 from localisation import localisation
 import time
+import math
 
 loc = localisation(True, True)
 
@@ -15,4 +15,4 @@ for a in range(4):
 	loc.loc_rotation(90)
 	time.sleep(1)
 
-loc.draw_all()
+#loc.draw_all()
