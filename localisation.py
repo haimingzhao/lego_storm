@@ -61,9 +61,7 @@ class localisation:
 			theta = p[a][THETA]
 			p[a] = (x,y,theta)
 			#print p[a]
-		print len(self.particles)
-		print len(p)
-		#print "drawParticles:" + str(p)
+		print "drawParticles:" + str(p)
 
 	def draw_line(self, x1, y1, x2, y2):
 		line = (x1, y1, x2, y2)
