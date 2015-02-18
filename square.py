@@ -4,7 +4,8 @@ import math
 robot = robot()
 
 for i in range(4):
-	robot.forward(40)
+	for i in range(4):
+		robot.forward(10)
 	robot.turnRight90()
 
 robot.terminate()
