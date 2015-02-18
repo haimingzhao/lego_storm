@@ -2,24 +2,25 @@ from robot import robot
 import math
 
 def navigateToWaypoint(x,y):
-	particle = robot.get_loc().getAverage(robot)
+	particle = robot.get_loc().get_Average()
 	currentX = particle[0]
 	currentY = particle[1]
-	theta = particle[3]
+	theta = particle[2]
 	dx = (100 *x) - currentX
 	dy = (100 *y) - currentY
-	alpha = atan2(dy,dx)
-	beta = normalize(alpha - theta,-math.pi,math.pi)
+	alpha = math.atan2(dy,dx)
+	beta = normalise(alpha - theta)
+	print beta
 	distance = math.hypot(dx, dy)
 	robot.turnDeg(beta)
-	robot.forward(self,distance,false)
+	robot.forward(distance,false)
 
 
 def normalise(angle):
-	if angle < -math.pi:
-		return angle + (2 * math.pi)
-	if angle > math.pi:
-		return angle - (2 * math.pi)
+	if angle < -180:
+		return angle + (360)
+	if angle > 180:
+		return angle - (360)
 	else :
 		return angle
 robot = robot()
