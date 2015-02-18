@@ -6,6 +6,7 @@ Imperial/*
 __pycache__/
 *.py[cod]
 *.py~
+*py.swo
 
 # C extensions
 *.so

@@ -53,16 +53,16 @@ class robot:
 		motorParams.maxRotationAcceleration = 6.0
 		motorParams.maxRotationSpeed = 12.0
 		motorParams.feedForwardGain = 255/22.0
-		motorParams.minPWM = 27
+		motorParams.minPWM = 25
 		motorParams.pidParameters.minOutput = -255
 		motorParams.pidParameters.maxOutput = 255
 
 		# proportional gain, reduces error
-		motorParams.pidParameters.k_p = 480.0
+		motorParams.pidParameters.k_p = 270.0
 		# integral gain, removes steady_state error
-		motorParams.pidParameters.k_i = 650
+		motorParams.pidParameters.k_i = 400
 		# differential gain, reduce settling time
-		motorParams.pidParameters.k_d = 250
+		motorParams.pidParameters.k_d = 160
 
 		self.setMotorAngleControllerParameters(wheel_motors[0], motorParams)
 		self.setMotorAngleControllerParameters(wheel_motors[1], motorParams)
