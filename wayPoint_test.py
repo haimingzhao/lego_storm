@@ -4,20 +4,20 @@ import math
 robot = robot();
 
 def navigateToWaypoint(x,y):
-	[currentX,currentY,currentTheta] = getAvgParticles
+	particle = getAvgParticles
 	dx = x - currentX
 	dy = y - currentY
 	alpha = atan2(dy,dx)
-	beta = normalise(alpha - theta)
-	robot.turn(beta)
+	beta = normalize(alpha - theta,-math.pi,math.pi)
 	distance = math.hypot(dx, dy)
-	robot.drive(distance)
+	robot.turnDeg(beta)
+	robot.forward(self,distance,false)
 
 
 def normalise(angle):
-	if angle < -pi:
-		return angle + (2 * pi)
-	if angle > pi:
-		return angle - (2 * pi)
+	if angle < -math.pi:
+		return angle + (2 * math.pi)
+	if angle > math.pi:
+		return angle - (2 * math.pi)
     else :
     	return angle
