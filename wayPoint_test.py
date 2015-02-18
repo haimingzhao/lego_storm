@@ -1,14 +1,6 @@
 from robot import robot
 import math
 
-robot = robot()
-while True:
-	x,y = raw_input("Enter x and y coordinates to travel to or ctrl+c to quit").split()
-	x = float(x)
-	y = float(y)
-	navigateToWaypoint(x,y)
-robot.terminate()
-
 def navigateToWaypoint(x,y):
 	particle = robot.get_loc().getAverage(robot)
 	currentX = particle[0]
@@ -30,3 +22,10 @@ def normalise(angle):
 		return angle - (2 * math.pi)
 	else :
 		return angle
+robot = robot()
+while True:
+	x,y = raw_input("Enter x and y coordinates to travel to or ctrl+c to quit").split()
+	x = float(x)
+	y = float(y)
+	navigateToWaypoint(x,y)
+robot.terminate()
