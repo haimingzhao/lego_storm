@@ -1,6 +1,7 @@
 import time
 import math
 import random
+import copy
 
 class localisation:
 
@@ -52,11 +53,11 @@ class localisation:
 		return angle
 
 	def draw_particles(self, particles):
-		p = self.particles[:]
+		p = copy.deepcopy(self.particles)
 		scalar = 10
 		for a in range(NUM_OF_PARTS):
-			x = p[a][X] * scalar
-			y = p[a][Y] * scalar
+			x = (p[a][X] * scalar) + 100
+			y = (p[a][Y] * scalar) + 100
 			theta = p[a][THETA]
 			p[a] = (x,y,theta)
 			#print p[a]
