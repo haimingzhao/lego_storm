@@ -232,8 +232,8 @@ class robot:
 	def turnDeg(self,degrees):
 		if degrees < 0 :
 			self.turnLeftDeg(degrees)
-	    else : 
-	    	self.turnRightDeg(degrees)
+		else : 
+			self.turnRightDeg(degrees)
 
 	def instantStop(self, verbose=False):
 		self.setMotorPwm(0, 0)
