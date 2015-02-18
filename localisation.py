@@ -38,7 +38,7 @@ class localisation:
 		global draw
 		draw = drawing
 		if record:
-			self.record_all = self.particles
+			self.record_all = copy.deepcopy(self.particles)
 			self.record = True
 		else:
 			self.record = False
@@ -61,7 +61,9 @@ class localisation:
 			theta = p[a][THETA]
 			p[a] = (x,y,theta)
 			#print p[a]
-		print "drawParticles:" + str(p)
+		print len(self.particles)
+		print len(p)
+		#print "drawParticles:" + str(p)
 
 	def draw_line(self, x1, y1, x2, y2):
 		line = (x1, y1, x2, y2)
@@ -88,13 +90,15 @@ class localisation:
 		self.particles[pid] = (x,y,theta)
 
 	def loc_distance(self, d):
-		if self.record: self.record_all += self.particles
+		if self.record:
+			self.record_all.extend(self.particles)
 		for p in range(NUM_OF_PARTS):
 			self.update_particle_distance(p, d)
 		if draw: self.draw_particles(self.particles)
 
 	def loc_rotation(self, angle):
-		if self.record: self.record_all += self.particles
+		if self.record:
+			self.record_all.extend(self.particles)
 		for p in range(NUM_OF_PARTS):
 			self.update_particle_rotation(p, angle)
 		if draw: self.draw_particles(self.particles)
