@@ -3,7 +3,7 @@ import time
 
 robot = robot()
 
-port = 0 # port which ultrasoic sensor is plugged in to
+port = 1 # port which ultrasoic sensor is plugged in to
 
 robot.sensorEnableUltrasonic(port)
 

@@ -13,15 +13,12 @@ class localisation:
 	global ROTATION
 	global origin
 	global draw
-	global scalar
 
 	NUM_OF_PARTS = 100
 
 	X = 0
 	Y = 1
 	THETA = 2
-
-	scalar = 10
 
 	# value in cm
 	LINEAR_DISTANCE = 0.5
@@ -30,7 +27,7 @@ class localisation:
 	# value in degrees
 	ROTATION = 2
 
-	origin = [(50,50,0)]
+	origin = [(0,0,0)]
 
 	draw = False
 
@@ -47,12 +44,14 @@ class localisation:
 			self.draw_particles(self.particles)
 
 	def draw_particles(self, particles):
-		p = self.particles
+		p = self.particles[:]
+		scalar = 10
 		for a in range(NUM_OF_PARTS):
 			x = p[a][X] * scalar
 			y = p[a][Y] * scalar
 			theta = p[a][THETA]
 			p[a] = (x,y,theta)
+			#print p[a]
 		print "drawParticles:" + str(p)
 
 	def draw_line(self, x1, y1, x2, y2):
@@ -60,7 +59,8 @@ class localisation:
 		print "drawLine:" + str(line)
 
 	def ran_gauss(self, sigma):
-		return random.gauss(0, sigma)
+		#return random.gauss(0, sigma)
+		return 0
 
 	def degreeToRad(self, degree):
 		return degree * math.pi / 180
@@ -68,8 +68,8 @@ class localisation:
 	def update_particle_distance(self, pid, distance):
 		e = self.ran_gauss(LINEAR_DISTANCE)
 		f = self.ran_gauss(LINEAR_ROTATION)
-		x = self.particles[pid][X] + (distance*e)*math.cos(self.particles[pid][THETA])
-		y = self.particles[pid][Y] + (distance*e)*math.sin(self.particles[pid][THETA])
+		x = self.particles[pid][X] + (distance+e)*math.cos(self.particles[pid][THETA])
+		y = self.particles[pid][Y] + (distance+e)*math.sin(self.particles[pid][THETA])
 		theta = self.particles[pid][THETA] + f
 		self.particles[pid] = (x,y,theta)
 
