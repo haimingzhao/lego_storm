@@ -14,7 +14,7 @@ class localisation:
 	global origin
 	global draw
 
-	NUM_OF_PARTS = 100
+	NUM_OF_PARTS = 1
 
 	X = 0
 	Y = 1
@@ -43,6 +43,13 @@ class localisation:
 		if drawing:
 			self.draw_particles(self.particles)
 
+	def wrap(self, angle):
+		if angle < 0:
+			angle += 360
+		if angle > 360:
+			angle -= 360
+		return angle
+
 	def draw_particles(self, particles):
 		p = self.particles[:]
 		scalar = 10
@@ -51,8 +58,8 @@ class localisation:
 			y = p[a][Y] * scalar
 			theta = p[a][THETA]
 			p[a] = (x,y,theta)
-			#print p[a]
-		print "drawParticles:" + str(p)
+			print p[a]
+		#print "drawParticles:" + str(p)
 
 	def draw_line(self, x1, y1, x2, y2):
 		line = (x1, y1, x2, y2)
@@ -62,22 +69,21 @@ class localisation:
 		#return random.gauss(0, sigma)
 		return 0
 
-	def degreeToRad(self, degree):
-		return degree * math.pi / 180
-
 	def update_particle_distance(self, pid, distance):
 		e = self.ran_gauss(LINEAR_DISTANCE)
 		f = self.ran_gauss(LINEAR_ROTATION)
-		x = self.particles[pid][X] + (distance+e)*math.cos(self.particles[pid][THETA])
-		y = self.particles[pid][Y] + (distance+e)*math.sin(self.particles[pid][THETA])
+		x = self.particles[pid][X] + (distance+e)*math.cos(math.radians(self.particles[pid][THETA]))
+		y = self.particles[pid][Y] + (distance+e)*math.sin(math.radians(self.particles[pid][THETA]))
 		theta = self.particles[pid][THETA] + f
+		self.wrap(theta)
 		self.particles[pid] = (x,y,theta)
 
 	def update_particle_rotation(self, pid, angle):
-		g = self.ran_gauss(self.degreeToRad(ROTATION))
+		g = self.ran_gauss(ROTATION)
 		x = self.particles[pid][X]
 		y = self.particles[pid][Y]
 		theta = self.particles[pid][THETA] + angle + g
+		self.wrap(theta)
 		self.particles[pid] = (x,y,theta)
 
 	def loc_distance(self, d):
@@ -93,6 +99,10 @@ class localisation:
 		if draw: self.draw_particles(self.particles)
 
 	def draw_all(self):
-		draw_particles(self.record_all)
+		self.draw_particles(self.record_all)
+
+	def get_average(self):
+		# TO DO
+		pass
 
 

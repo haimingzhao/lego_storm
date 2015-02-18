@@ -207,21 +207,21 @@ class robot:
 		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([angle, -angle])
-		self.loc.loc_rotation(angle)
+		self.loc.loc_rotation(math.degrees(-radius))
 		if verbose or all_verbose: print "Completed right turn " + str(radius)
 
 	def turnLeftRad(self, radius, verbose=False):
 		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([-angle, angle])
-		self.loc.loc_rotation(-angle)
+		self.loc.loc_rotation(math.degrees(-radius))
 		if verbose or all_verbose: print "Completed left turn " + str(radius)
 
 	def turnRightDeg(self, degrees):
-		self.turnRightRad(self.degreeToRad(degrees))
+		self.turnRightRad(math.radians(degrees))
 
 	def turnLeftDeg(self, degrees):
-		self.turnLeftRad(self.degreeToRad(degrees))
+		self.turnLeftRad(math.radians(degrees))
 
 	def turnRight90(self):
 		self.turnRightRad(math.pi/2)	
@@ -285,21 +285,6 @@ class robot:
 	def disableSonar(self):
 		self.sensorDisable(sonar)
 
-	def sonarTurnRight(self, degrees):
-		self.increaseMotorAngleReference(sonar_motor, self.degreeToRad(degrees))
-                while not self.motorAngleReferenceReached(sonar_motor):
-                        sonarAngle = self.getMotorAngle(sonar_motor)
-                        time.sleep(0.1)
-
-	def sonarFront(self):
-		pass
-
-	def sonarRightFollow(self):
-		pass
-
-	def sonarLeftFollow(self):
-		pass
-
 	def check_bumper(self):
 		return self.getSensorValue(left_touch)[0] or self.getSensorValue(right_touch)[0]
 
@@ -333,9 +318,6 @@ class robot:
 
 	def wheelRadianTurn(radians):
 		return (radians * wheel_seperation) / (2 * wheel_radius)
-
-	def degreeToRad(self, degree):
-		return degree * math.pi / 180
 
 	def turn(self, angles):
 		self.increaseMotorAngleReferences(wheel_motors, angles)
