@@ -84,6 +84,7 @@ class localisation:
 		y = self.particles[pid][Y] + (distance+e)*math.sin(math.radians(self.particles[pid][THETA]))
 		theta = self.particles[pid][THETA]
 		self.particles[pid] = (x,y,theta)
+		
 
 	def update_particle_rotation(self, pid, angle):
 		g = self.ran_gauss(ROTATION)

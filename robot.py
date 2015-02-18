@@ -207,14 +207,14 @@ class robot:
 		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([angle, -angle])
-		self.loc.loc_rotation(math.degrees(radius))
+		self.loc.loc_rotation(math.degrees(-radius))
 		if verbose or all_verbose: print "Completed right turn " + str(radius)
 
 	def turnLeftRad(self, radius, verbose=False):
 		length = radius*wheel_separation/2
 		angle = length/wheel_radius
 		self.turn([-angle, angle])
-		self.loc.loc_rotation(math.degrees(-radius))
+		self.loc.loc_rotation(math.degrees(radius))
 		if verbose or all_verbose: print "Completed left turn " + str(radius)
 
 	def turnRightDeg(self, degrees):
@@ -230,7 +230,7 @@ class robot:
 		self.turnLeftRad(math.pi/2)
 
 	def turnDeg(self,degrees):
-		if degrees > 0 :
+		if degrees <180 :
 			self.turnLeftDeg(degrees)
 		else : 
 			self.turnRightDeg(degrees)
