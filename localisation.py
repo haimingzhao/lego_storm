@@ -15,6 +15,11 @@ class localisation:
 	global origin
 	global draw
 	global scalar
+	global origin_offset_x
+	global origin_offset_y
+
+	origin_offset_x = 200
+	origin_offset_y = 200
 
 	scalar = 10
 
@@ -25,11 +30,11 @@ class localisation:
 	THETA = 2
 
 	# value in cm
-	LINEAR_DISTANCE = 0.5
+	LINEAR_DISTANCE = 0.39
 	# value in degrees
 	LINEAR_ROTATION = 0.1
 	# value in degrees
-	ROTATION = 1
+	ROTATION = 0.39
 
 	origin = [(0,0,0)]
 
@@ -42,7 +47,8 @@ class localisation:
 		global draw
 		draw = drawing
 		if record:
-			self.record_all = copy.deepcopy(self.particles)
+			self.record_all = []
+			self.record_all += self.particles
 			self.record = True
 		else:
 			self.record = False
@@ -62,17 +68,17 @@ class localisation:
 		return angle
 
 	def draw_particles(self, particles):
-		p = copy.deepcopy(self.particles)
+		p = copy.deepcopy(particles)
 		for a in range(NUM_OF_PARTS):
-			x = (p[a][X] * scalar) + 500
-			y = (p[a][Y] * scalar) + 500
+			x = (p[a][X] * scalar) + origin_offset_x
+			y = -(p[a][Y] * scalar) + origin_offset_y
 			theta = p[a][THETA]
 			p[a] = (x,y,theta)
 			#print p[a]
 		print "drawParticles:" + str(p)
 
 	def draw_line(self, x1, y1, x2, y2):
-		line = (x1, y1, x2, y2)
+		line = ((x1*scalar)+origin_offset_x, (y1*scalar)+origin_offset_y, (x2*scalar)+origin_offset_x, (y2*scalar)+origin_offset_y)
 		print "drawLine:" + str(line)
 
 	def ran_gauss(self, sigma):
@@ -96,14 +102,14 @@ class localisation:
 
 	def loc_distance(self, d):
 		if self.record:
-			self.record_all.extend(self.particles)
+			self.record_all += self.particles
 		for p in range(NUM_OF_PARTS):
 			self.update_particle_distance(p, d)
 		if draw: self.draw_particles(self.particles)
 
 	def loc_rotation(self, angle):
 		if self.record:
-			self.record_all.extend(self.particles)
+			self.record_all += self.particles
 		for p in range(NUM_OF_PARTS):
 			self.update_particle_rotation(p, angle)
 		if draw: self.draw_particles(self.particles)
