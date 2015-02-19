@@ -13,7 +13,6 @@ def navigateToWaypoint(x,y):
 	distance = math.hypot(dx, dy)
 	robot.turnDeg(beta)
 	robot.forward(distance,False)
-
 	print robot.get_loc().get_average()
 
 def normalise(angle):
@@ -30,11 +29,5 @@ while True:
 	x = float(x)
 	y = float(y)	
 	navigateToWaypoint(x,y)
-#navigateToWaypoint(0.5,0)
-#navigateToWaypoint(0,0)
-#navigateToWaypoint(0,0.5)
-#navigateToWaypoint(0,0)
-#navigateToWaypoint(-0.5,-0.5)
-#navigateToWaypoint(-0.5,0)
-#navigateToWaypoint(0,-0.5)	
+	
 robot.terminate()
