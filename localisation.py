@@ -128,4 +128,5 @@ class localisation:
 		return [self.norm_output(av_x), self.norm_output(av_y),(av_t)]
 
 
-
+        def get_particles(self):
+            return self.particles
