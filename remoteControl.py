@@ -4,6 +4,7 @@ import thread
 import sys
 
 robot = robot()
+robot.enableBumper()
 
 try:
 	from msvcrt import getch
@@ -23,18 +24,22 @@ motors = [0,1]
 speed = 150
 
 def backward():
+	robot.instantStop()
 	robot.setMotorRotationSpeedReferences(motors, [-speed, -speed])
 
 def forward():
+	robot.instantStop()
 	robot.setMotorRotationSpeedReferences(motors, [speed,speed])
 
 def stop():
-	robot.setMotorRotationSpeedReferences(motors, [0,0])
+	robot.instantStop()
 
 def right():
+	robot.instantStop()
 	robot.setMotorRotationSpeedReferences(motors, [speed, 0])
 
 def left():
+	robot.instantStop()
 	robot.setMotorRotationSpeedReferences(motors, [0, speed])
 
 stopped = True
