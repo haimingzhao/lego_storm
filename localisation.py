@@ -56,9 +56,7 @@ class localisation:
 			self.draw_particles(self.particles)
 
 	def norm_output(self, value):
-		if value < 0.001 and value > -0.001:
-			return 0.0
-		return value
+		return round(2, value)
 
 	def wrap(self, angle):
 		if angle < 0:
@@ -74,11 +72,14 @@ class localisation:
 			y = -(p[a][Y] * scalar) + origin_offset_y
 			theta = p[a][THETA]
 			p[a] = (x,y,theta)
-			#print p[a]
 		print "drawParticles:" + str(p)
 
 	def draw_line(self, x1, y1, x2, y2):
-		line = ((x1*scalar)+origin_offset_x, (y1*scalar)+origin_offset_y, (x2*scalar)+origin_offset_x, (y2*scalar)+origin_offset_y)
+		x1 = (x1*scalar)+origin_offset_x
+		y1 = (y1*scalar)+origin_offset_y
+		x2 = (x2*scalar)+origin_offset_x
+		y2 =(y2*scalar)+origin_offset_y
+		line = (x1, y1, x2, y2)
 		print "drawLine:" + str(line)
 
 	def ran_gauss(self, sigma):
@@ -101,15 +102,13 @@ class localisation:
 		self.particles[pid] = (x,y,theta)
 
 	def loc_distance(self, d):
-		if self.record:
-			self.record_all += self.particles
+		if self.record: self.record_all += self.particles
 		for p in range(NUM_OF_PARTS):
 			self.update_particle_distance(p, d)
 		if draw: self.draw_particles(self.particles)
 
 	def loc_rotation(self, angle):
-		if self.record:
-			self.record_all += self.particles
+		if self.record: self.record_all += self.particles
 		for p in range(NUM_OF_PARTS):
 			self.update_particle_rotation(p, angle)
 		if draw: self.draw_particles(self.particles)
