@@ -20,7 +20,8 @@ for a in range(4):
     robot.forward(10)
     robot.turnRightDeg(90)
 
-#l.draw_all()
+l.draw_all()
+
     
     
     

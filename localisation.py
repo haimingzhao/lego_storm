@@ -69,7 +69,7 @@ class localisation:
 
 	def draw_particles(self, particles):
 		p = copy.deepcopy(particles)
-		for a in range(NUM_OF_PARTS):
+		for a in range(len(particles)):
 			x = (p[a][X] * scalar) + origin_offset_x
 			y = -(p[a][Y] * scalar) + origin_offset_y
 			theta = p[a][THETA]
