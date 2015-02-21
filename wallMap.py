@@ -1,3 +1,4 @@
+from localisation import localisation
 
 WALLS = [(0,0,0,168), (0,168,84,168), (84,126,84,210),
 	 (84,210,168,210), (168,210,168,84), (168,84,210,84),
@@ -5,20 +6,17 @@ WALLS = [(0,0,0,168), (0,168,84,168), (84,126,84,210),
 
 
 class WallMap:
-    def __init__(self):
-	self.walls = []
-	for wall in WALLS:
-	    self.add_wall(wall)
-
-    def add_wall(self, wall):
-	self.walls.append(wall)
+    def __init__(self, loc):
+        self.loc = loc
+        self.walls = []
+        self.walls += WALLS
 
     def clear(self):
-	self.walls = []
+        self.walls = []
 
-    # TODO: implement this
     def draw(self):
-	pass
+        for a in self.walls:
+            self.loc.draw_line(a[0], a[1], a[2], a[3])
 
     def get_walls(self):
-	return self.walls
+        return self.walls
