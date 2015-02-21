@@ -2,6 +2,7 @@ import sys
 from robot import robot
 import time
 import math
+import copy
 
 class mlc:
 
@@ -9,11 +10,14 @@ class mlc:
     INITIAL_Y = 20
     INITIAL_THETA = 0
 
+    def __init__(self):
+        pass
+
 #This sets up for the waypoint test.
     def set_waypoint_start(particles):
         p = copy.deepcopy(particles)
         for i in range(len(particles)):
-            p[i] = (INITIAL_X,INITIAL_Y,INITIAL_THETA)
+            p[i] = (mlc.INITIAL_X, mlc.INITIAL_Y, mlc.INITIAL_THETA)
 
         return p 
 

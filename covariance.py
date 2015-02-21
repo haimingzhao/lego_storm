@@ -9,10 +9,10 @@ def sub_then_square(li, mean):
          output.append(math.pow((x - mean), 2))
     return output 
 
-def sub_them_multiply(xli, yli, xmean, ymean):
+def sub_them_multiply(xli, yli, xm, ym):
     output = []
     for x in range(10):
-        output.append((xli[x]-xmean)*(yli[x]-ymean))
+        output.append((xli[x]-xm)*(yli[x]-ym))
     return output
 
 
@@ -22,8 +22,8 @@ xcos = [-0.05, 0.12, 0.2, 0.3, -0.45, 0, -0.2, -0.3, 0.05, 0]
 ycos = [-0.5, -0.9, -1.05, -1.0, 0.35, -0.3, -0.2, -0.3, -0.3, -0.3]
 
 if not len(xcos) == len(ycos):
-	print "Array lengths are different!!!"
-	sys.exit()
+    print "Array lengths are different!!!"
+    sys.exit()
 
 xmean = sum(xcos)/10
 ymean = sum(ycos)/10

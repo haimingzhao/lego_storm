@@ -1,7 +1,6 @@
 import sys
 sys.path.insert(0, '../')
 from robot import robot
-import time
 
 
 robot = robot(True, True)
