@@ -3,7 +3,6 @@ import time
 import math
 from localisation import localisation
 
-
 class robot:
     # WARNING: IT APPEARS SENSOR PORTS 4 & 5 ARE BROKEN
     # ALSO SEE MAPPINGS BELOW AS THEY ARE WRONG
@@ -231,6 +230,16 @@ class robot:
         self.setMotorPwm(1, 0)
         if verbose or all_verbose: print "Instant stop!!!"
 
+    def navigateToWaypoint(self, x, y):
+        currentX, currentY, theta = self.loc.get_average()
+        dx = (100 * x) - currentX
+        dy = (100 * y) - currentY
+        alpha = math.degrees(math.atan2(dy, dx))
+        beta = normalise_angle(alpha - theta)
+        distance = math.hypot(dx, dy)
+        self.turnDeg(beta)
+        self.forward(distance)
+
 
     #############################################################################
     ########     PUBLIC SENSOR METHODS    #######################################
@@ -286,6 +295,15 @@ class robot:
     #############################################################################
     ########     PRIVATE METHODS    #############################################
     #############################################################################
+
+    @staticmethod
+    def normalise_angle(angle):
+        if angle < 0:
+            return normalise_angle(angle + 360)
+        if angle > 360 :
+            return normalise_angle(angle - 360)
+        else :
+            return angle
 
     @staticmethod
     def wheelRadianTurn(radians):
