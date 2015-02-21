@@ -1,16 +1,18 @@
 import random
 import copy
 import math
+import numpy as np
 
 class localisation:
 
+    # Offsets for visualisation
     origin_offset_x = 200
     origin_offset_y = 200
-
     scalar = 10
 
     NUM_OF_PARTS = 100
 
+    # Positions in particle vector
     X = 0
     Y = 1
     THETA = 2
@@ -115,6 +117,26 @@ class localisation:
             av_y += self.weightings[p] * self.particles[p][localisation.Y]
             av_t += self.weightings[p] * self.particles[p][localisation.THETA]
         return [self.norm_output(av_x), self.norm_output(av_y),av_t]
+
+
+    # Updates weights of all the particles using the likelihood function
+    def update(self, sonarMeasurements):
+	sonarMedian = np.median(sonarMeasurements)
+	
+	for i in range(localisation.NUM_OF_PARTS):
+		particle = self.particles[i]
+		self.weightings[i] = self.calculateLikelihood(p, sonarMedian)
+
+	
+    # Returns a likelihood given a particle and mean sonar measurement
+    def calculateLikelihood(self, p, sonarM):
+	m = self.getDepthMeasurement(p)
+	
+
+    # Finds out which wall is the robot facing and gets "true" distance from it
+    def getDepthMeasurement(self, p)
+	
+
 
 
     def get_particles(self):
