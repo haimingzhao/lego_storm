@@ -10,8 +10,8 @@ class WallMap:
         self.walls = []
         self.walls += WALLS
 
-	def isOnWall(self, point, wall):
-		pass	
+    def isOnWall(self, point, wall):
+        pass
 	
     def clear(self):
         self.walls = []

@@ -122,50 +122,50 @@ class localisation:
 
 
     # Updates weights of all the particles using the likelihood function
-	def update(self, sonarMeasurements):
-		z = np.median(sonarMeasurements)
+    def update(self, sonarMeasurements):
+        z = np.median(sonarMeasurements)
 	
-		for i in range(localisation.NUM_OF_PARTS):
-			particle = self.particles[i]
-			self.weightings[i] = self.calculateLikelihood(particle, z)
-		return -1
+        for i in range(localisation.NUM_OF_PARTS):
+            particle = self.particles[i]
+            self.weightings[i] = self.calculateLikelihood(particle, z)
+        return -1
 	
     # Returns a likelihood given a particle and mean sonar measurement
-	def calculateLikelihood(self, p, z):
-		m = self.getDepthMeasurement(p)
-		pass
+    def calculateLikelihood(self, p, z):
+        m = self.getDepthMeasurement(p)
+        pass
 
     # Finds out which wall is the robot facing and gets "true" distance from it
-	def getDepthMeasurement(self, p):
-		# Represents the distance from each wall [(wall, distance)]
-		wallDistances = []
-		# Calculate the distance from each wall
-		walls = WallMap.getWalls()
-		for wall in walls:
-			distance = self.calcDistanceFromWall(wall, p)
-			if distance >=0:
-				wallDistances.append((wall, distance))
-		# Sort the distances
-		wallDistances = sorted(wallDistances, key=lambda x: x[1])
+    def getDepthMeasurement(self, p):
+        # Represents the distance from each wall [(wall, distance)]
+        wallDistances = []
+        # Calculate the distance from each wall
+        walls = self.wallMap.get_walls()
+        for wall in walls:
+            distance = self.calcDistanceFromWall(wall, p)
+            if distance >=0:
+                wallDistances.append((wall, distance))
+        # Sort the distances
+        wallDistances = sorted(wallDistances, key=lambda x: x[1])
 
-		# Take the smallest distance, while checking if the point actually is on the wall
-		x,y,theta = p
-		for wall, m in wallDistances:
-			meetPoint = (x+m*math.cos(math.radians(theta)) , y+m*math.sin(math.radians(theta)))
-			if wallMap.isOnWall(meetPoint, wall):
-				return m
-		# Failed to find a distance
-		return -1
+        # Take the smallest distance, while checking if the point actually is on the wall
+        x,y,theta = p
+        for wall, m in wallDistances:
+            meetPoint = (x+m*math.cos(math.radians(theta)) , y+m*math.sin(math.radians(theta)))
+            if self.wallMap.isOnWall(meetPoint, wall):
+                return m
+        # Failed to find a distance
+        return -1
 
 
     def calcDistanceFromWall(self, wall, p):
-		Ax,Ay,Bx,By = wall
-		x,y,theta = p
-		cosTheta = math.cos(math.radians(theta))
-		sinTheta = math.sin(math.radians(theta))
-		top = (By - Ay)*(Ax - x) - (Bx - Ax)*(Ay - y)
-		bottom = (By - Ay)*cosTheta - (Bx - Ax)*sinTheta
-		return top / float(bottom)
+        Ax,Ay,Bx,By = wall
+        x,y,theta = p
+        cosTheta = math.cos(math.radians(theta))
+        sinTheta = math.sin(math.radians(theta))
+        top = (By - Ay)*(Ax - x) - (Bx - Ax)*(Ay - y)
+        bottom = (By - Ay)*cosTheta - (Bx - Ax)*sinTheta
+        return top / float(bottom)
 
 
     def get_particles(self):
