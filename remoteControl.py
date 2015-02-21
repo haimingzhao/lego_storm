@@ -1,6 +1,4 @@
 from robot import robot
-import time
-import thread
 import sys
 
 robot = robot()
