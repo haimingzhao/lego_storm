@@ -118,7 +118,7 @@ class localisation:
             av_x += self.weightings[p] * self.particles[p][localisation.X]
             av_y += self.weightings[p] * self.particles[p][localisation.Y]
             av_t += self.weightings[p] * self.particles[p][localisation.THETA]
-        return [self.norm_output(av_x), self.norm_output(av_y),av_t]
+        return self.norm_output(av_x), self.norm_output(av_y), av_t
 
 
     # Updates weights of all the particles using the likelihood function
@@ -133,14 +133,14 @@ class localisation:
     # Returns a likelihood given a particle and mean sonar measurement
     def calculateLikelihood(self, p, z):
         m = self.getDepthMeasurement(p)
-	
+
 
     # Finds out which wall is the robot facing and gets "true" distance from it
 	def getDepthMeasurement(self, p):
 		# Represents the distance from each wall [(wall, distance)]
 		wallDistances = []
 		# Calculate the distance from each wall
-		walls = WallMap.getWalls()
+		walls = self.wallMap.get_walls()
 		for wall in walls:
 			distance = self.calcDistanceFromWall(wall, p)
 			if distance >=0:
@@ -152,10 +152,11 @@ class localisation:
 		x,y,theta = p
 		for wall, m in wallDistances:
 			meetPoint = (x+m*math.cos(math.radians(theta)) , y+m*math.sin(math.radians(theta)))
-			if wallMap.isOnWall(meetPoint, wall):
+			if self.wallMap.isOnWall(meetPoint, wall):
 				return m
 		# Failed to find a distance
 		return -1
+
 
 
     def calcDistanceFromWall(self, wall, p):
