@@ -6,7 +6,7 @@ import math
 class mlc:
 
     INITIAL_X = 84
-    INITIAL_Y = 20
+    INITIAL_Y = 30
     INITIAL_THETA = 0
 
 #This sets up for the waypoint test.
