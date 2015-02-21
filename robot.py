@@ -235,7 +235,7 @@ class robot:
         dx = (100 * x) - currentX
         dy = (100 * y) - currentY
         alpha = math.degrees(math.atan2(dy, dx))
-        beta = normalise_angle(alpha - theta)
+        beta = robot.normalise_angle(alpha - theta)
         distance = math.hypot(dx, dy)
         self.turnDeg(beta)
         self.forward(distance)
@@ -299,9 +299,9 @@ class robot:
     @staticmethod
     def normalise_angle(angle):
         if angle < 0:
-            return normalise_angle(angle + 360)
+            return robot.normalise_angle(angle + 360)
         if angle > 360 :
-            return normalise_angle(angle - 360)
+            return robot.normalise_angle(angle - 360)
         else :
             return angle
 
