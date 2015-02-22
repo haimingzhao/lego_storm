@@ -48,6 +48,7 @@ class localisation:
         self.wallMap = WallMap(self)
         weight = float(1 / float(localisation.NUM_OF_PARTS))
         self.weightings = [weight] * localisation.NUM_OF_PARTS
+        self.cumulative_weight = np.cumsum(self.weightings)
         global draw
         draw = drawing
         if record:
@@ -125,9 +126,30 @@ class localisation:
     def update(self, sonarMeasurements):
         z = np.median(sonarMeasurements)
         var = np.var(sonarMeasurements)
+        total_weight = 0
         for i in range(localisation.NUM_OF_PARTS):
             particle = self.particles[i]
-            self.weightings[i] = self.calculateLikelihood(particle, z, var)
+            likely =  calculateLikelihood(particle, z, var)
+            w = self.weightings[i]
+            #update the weighting of the particle based on likelyhood
+            self.weightings[i] = likely * w
+            total_weight += self.weightings[i]
+
+        #normalise the weights
+        for i in range(localisation.NUM_OF_PARTS):
+            self.weightings[i] = self.weightings[i] / total_weight
+
+        #sets the cumulative weight for resampling
+        self.cumulative_weight = np.cumsum(self.weightings)
+
+        #way to cumbersome, looking into paper for O(n) time
+        #This is the resampling section
+        for i in range(localisation.NUM_OF_PARTS):
+            rand = np.random.random_sample()
+            for j in range(localisation.NUM_OF_PARTS):
+                if rand < self.cumulative_weight[j]:
+                    self.particles[i]  = self.particles[j]
+                    break
 
 
     # Returns a likelihood given a particle and mean sonar measurement
@@ -174,3 +196,10 @@ class localisation:
         top = (By - Ay)*(Ax - x) - (Bx - Ax)*(Ay - y)
         bottom = (By - Ay)*cosTheta - (Bx - Ax)*sinTheta
         return -1 if bottom == 0 else top / float(bottom)
+
+
+    def getCumWeight(self):
+        return self.cumulative_weight
+
+l = localisation()
+l.test()
