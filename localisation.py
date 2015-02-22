@@ -167,18 +167,10 @@ class localisation:
 
 
     def calcDistanceFromWall(self, wall, p):
-		Ax,Ay,Bx,By = wall
-		x,y,theta = p
-		cosTheta = math.cos(math.radians(theta))
-		sinTheta = math.sin(math.radians(theta))
-		top = (By - Ay)*(Ax - x) - (Bx - Ax)*(Ay - y)
-		bottom = (By - Ay)*cosTheta - (Bx - Ax)*sinTheta
-		return -1 if bottom == 0 else top / float(bottom)
-
-
-    def get_particles(self):
-        return self.particles
-
-l = localisation()
-x = l.getDepthMeasurement((190,10,15))
-print 'FINAL VALUE = ' + str(x)
+        Ax,Ay,Bx,By = wall
+        x,y,theta = p
+        cosTheta = math.cos(math.radians(theta))
+        sinTheta = math.sin(math.radians(theta))
+        top = (By - Ay)*(Ax - x) - (Bx - Ax)*(Ay - y)
+        bottom = (By - Ay)*cosTheta - (Bx - Ax)*sinTheta
+        return -1 if bottom == 0 else top / float(bottom)

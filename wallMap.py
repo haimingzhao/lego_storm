@@ -13,15 +13,15 @@ class WallMap:
         self.walls += WALLS
 
     def isOnWall(self, point, wall):
-	wallA = (wall[0],wall[1])
-	wallB = (wall[2],wall[3])
+        wallA = (wall[0],wall[1])
+        wallB = (wall[2],wall[3])
 
         # Distance between point and starting points of the wall
-        distWallA = self.distanceBetweenPoints(point, wallA)
-        distWallB = self.distanceBetweenPoints(point, wallB)
+        distWallA = WallMap.distanceBetweenPoints(point, wallA)
+        distWallB = WallMap.distanceBetweenPoints(point, wallB)
 
         # Length of the wall
-        wallLength = self.distanceBetweenPoints(wallA, wallB)
+        wallLength = WallMap.distanceBetweenPoints(wallA, wallB)
 	return distWallA + distWallB == wallLength
 
 
@@ -36,8 +36,8 @@ class WallMap:
         desired_val = math.radians(25)
         return angle < desired_val
 
-
-    def distanceBetweenPoints(self, p1, p2):
+    @staticmethod
+    def distanceBetweenPoints(p1, p2):
 	x1, y1 = p1
 	x2, y2 = p2
 	return math.hypot(x2 - x1, y2 - y1)
