@@ -6,6 +6,7 @@ WALLS = [(0,0,0,168), (0,168,84,168), (84,126,84,210),
 
 
 class WallMap:
+
     def __init__(self, loc):
         self.loc = loc
         self.walls = []
@@ -13,7 +14,7 @@ class WallMap:
 
     def isOnWall(self, point, wall):
 	wallA = (wall[0],wall[1])
-	wallB = (wall[2],wall[3])	
+	wallB = (wall[2],wall[3])
 
         # Distance between point and starting points of the wall
         distWallA = self.distanceBetweenPoints(point, wallA)
@@ -21,12 +22,25 @@ class WallMap:
 
         # Length of the wall
         wallLength = self.distanceBetweenPoints(wallA, wallB)
-	return distWallA + distWallB == wallLength	
+	return distWallA + distWallB == wallLength
+
+
+    def reasonableAngle(self, theta, wall):
+        theta = math.radians(theta)
+        Ax, Ay, Bx, By = wall
+        left = (Ay - By) * math.cos(theta)
+        right = (Bx - Ax) * math.sin(theta)
+        top = left + right
+        bottom = math.sqrt(pow((Ay - By), 2) + pow((Bx - Ax), 2))
+        angle = math.acos(top / bottom)
+        desired_val = math.radians(25)
+        return angle < desired_val
+
 
     def distanceBetweenPoints(self, p1, p2):
-	x1,y1 = p1
-	x2,y2 = p2
-	return math.hypot(x2 - x1, y2 - y1) 
+	x1, y1 = p1
+	x2, y2 = p2
+	return math.hypot(x2 - x1, y2 - y1)
 
     def clear(self):
         self.walls = []

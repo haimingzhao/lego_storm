@@ -124,16 +124,22 @@ class localisation:
     # Updates weights of all the particles using the likelihood function
     def update(self, sonarMeasurements):
         z = np.median(sonarMeasurements)
-	
+        var = np.var(sonarMeasurements)
         for i in range(localisation.NUM_OF_PARTS):
             particle = self.particles[i]
-            self.weightings[i] = self.calculateLikelihood(particle, z)
+            self.weightings[i] = self.calculateLikelihood(particle, z, var)
 
-	
+
     # Returns a likelihood given a particle and mean sonar measurement
-    def calculateLikelihood(self, p, z):
+    def calculateLikelihood(self, p, z, var):
         m = self.getDepthMeasurement(p)
-	# TODO: IMPLEMENT THIS, ASHKI
+        diff = z - m
+        top = -(pow(diff,2))
+        bottom = 2 * var
+        # Can add constant value K to make it more robust
+        return math.e * (top / bottom)
+
+
 
     # Finds out which wall is the robot facing and gets "true" distance from it
     def getDepthMeasurement(self, p):
@@ -152,13 +158,13 @@ class localisation:
 		x,y,theta = p
 		for wall, m in wallDistances:
 			meetPoint = (x+m*math.cos(math.radians(theta)) , y+m*math.sin(math.radians(theta)))
-			if self.wallMap.isOnWall(meetPoint, wall):
+			if self.wallMap.isOnWall(meetPoint, wall) and self.wallMap.reasonableAngle(theta, wall):
 				print wall
 				print meetPoint
 				return m
 		# Failed to find a distance
 		return -1
-	
+
 
     def calcDistanceFromWall(self, wall, p):
 		Ax,Ay,Bx,By = wall
@@ -172,3 +178,7 @@ class localisation:
 
     def get_particles(self):
         return self.particles
+
+l = localisation()
+x = l.getDepthMeasurement((190,10,15))
+print 'FINAL VALUE = ' + str(x)
