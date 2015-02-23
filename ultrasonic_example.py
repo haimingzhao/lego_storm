@@ -7,16 +7,14 @@ port = 1 # port which ultrasoic sensor is plugged in to
 
 robot.sensorEnableUltrasonic(port)
 
-for i in range(1000):
-	# usReading[0] is distance away
-	# usReading[1] is timestamp
+while True:
 	usReading = robot.getSensorValue(port)
 
-	#if usReading :
-		#print usReading
-	#else:
-		#print "Failed US reading"
+	if usReading :
+		print usReading
+	else:
+		print "Failed US reading"
 
-	#time.sleep(0.05)
+	time.sleep(0.05)
 
 robot.terminate()

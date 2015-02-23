@@ -238,8 +238,22 @@ class robot:
         beta = robot.normalise_angle(alpha - theta)
         distance = math.hypot(dx, dy)
         self.turnDeg(beta)
-        self.forward(distance)
-
+	d = distance - 20
+	if d > 0:
+		self.forward(20)
+		self.getSonarAndUpdate()
+		# Continue navigating to x,y
+		self.navigateToWaypoint(x,y)
+	else:
+		self.forward(distance)
+		self.getSonarAndUpdate()
+	
+    def getSonarAndUpdate(self):
+        # Get sonar measurements
+        sonarMeasurements = self.getSonarMeasurements(100)
+        # Update particles
+        self.loc.update(sonarMeasurements)
+	self.loc.drawAllParticles()
 
     #############################################################################
     ########     PUBLIC SENSOR METHODS    #######################################
@@ -249,12 +263,19 @@ class robot:
         global bumper_enabled
         self.sensorEnableTouch(robot.left_touch)
         self.sensorEnableTouch(robot.right_touch)
-        if verbose or all_verbose: print "Bumper Enabled"
+        if verbose or robot.all_verbose: print "Bumper Enabled"
         bumper_enabled = True
 
     def enableSonar(self, verbose=False):
         self.sensorEnableUltrasonic(robot.sonar)
-        if verbose or all_verbose: print "Sonar Enabled"
+        if verbose or robot.all_verbose: print "Sonar Enabled"
+
+    def getSonarMeasurements(self, n):
+	readings = []
+        for i in range(n):
+            readings.append(self.getSensorValue(robot.sonar)[0])
+        return readings          
+  
 
     def disableBumper(self):
         global bumper_enabled

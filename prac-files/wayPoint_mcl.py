@@ -2,6 +2,7 @@ import sys
 sys.path.insert(0, '../')
 from robot import robot
 
+port = 1 # port which ultrasoic sensor is plugged in to
 positions = [(180, 30),
              (180, 54),
              (126, 54),
@@ -11,8 +12,10 @@ positions = [(180, 30),
              (84, 54),
              (84, 30)]
 
-robot = robot()
-
+robot = robot(True)
+l = robot.get_loc()
+l.setParticlesTo((84,30,0))
+robot.sensorEnableUltrasonic(port)
 robot.enableBumper()
 
 # remember to change origin in localisation to (84,30)

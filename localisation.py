@@ -111,6 +111,9 @@ class localisation:
     def draw_all(self):
         self.draw_particles(self.record_all)
 
+    def drawAllParticles(self):
+	self.draw_particles(self.particles)
+
     def get_average(self):
         av_x = 0
         av_y = 0
@@ -119,8 +122,7 @@ class localisation:
             av_x += self.weightings[p] * self.particles[p][localisation.X]
             av_y += self.weightings[p] * self.particles[p][localisation.Y]
             av_t += self.weightings[p] * self.particles[p][localisation.THETA]
-        return [self.norm_output(av_x), self.norm_output(av_y),av_t]
-
+        return (localisation.norm_output(av_x), localisation.norm_output(av_y),av_t)
 
     # Updates weights of all the particles using the likelihood function
     def update(self, sonarMeasurements):
@@ -198,8 +200,10 @@ class localisation:
         return -1 if bottom == 0 else top / float(bottom)
 
 
+    def setParticlesTo(self, position):
+        for p in self.particles:
+	    p = position
+
+
     def getCumWeight(self):
         return self.cumulative_weight
-
-l = localisation()
-l.test()
