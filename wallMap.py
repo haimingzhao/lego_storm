@@ -45,7 +45,7 @@ class WallMap:
     def clear(self):
         self.walls = []
 
-    def draw(self):
+    def draw_walls(self):
         for a in self.walls:
             self.loc.draw_line(a[0], a[1], a[2], a[3])
 

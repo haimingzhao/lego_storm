@@ -46,6 +46,7 @@ class localisation:
     def __init__(self, drawing=False, record=False):
         self.particles = localisation.origin * localisation.NUM_OF_PARTS
         self.wallMap = WallMap(self)
+        self.wallMap.draw_walls()
         weight = float(1 / float(localisation.NUM_OF_PARTS))
         self.weightings = [weight] * localisation.NUM_OF_PARTS
         self.cumulative_weight = np.cumsum(self.weightings)
