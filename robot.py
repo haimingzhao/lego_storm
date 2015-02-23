@@ -171,12 +171,11 @@ class robot:
 
     @staticmethod
     def setAllVerbose(value):
-        global all_verbose
-        all_verbose = value
+        robot.all_verbose = value
 
     @staticmethod
     def getAllVerbose():
-        return all_verbose
+        return robot.all_verbose
 
     #############################################################################
     ########     PUBLIC MOVEMENT METHODS    #####################################
@@ -186,26 +185,26 @@ class robot:
     def forward(self, distance, verbose=False):
         self.linearMove(distance)
         self.loc.loc_distance(distance)
-        if verbose or all_verbose: print "Completed forward " + str(distance)
+        if verbose or robot.all_verbose: print "Completed forward " + str(distance)
 
     def backward(self, distance, verbose=False):
         self.linearMove(-distance)
         self.loc.loc_distance(-distance)
-        if verbose or all_verbose: print "Completed backward " + str(distance)
+        if verbose or robot.all_verbose: print "Completed backward " + str(distance)
 
     def turnRightRad(self, radius, verbose=False):
         length = radius * robot.wheel_separation / 2
         angle = length / robot.wheel_radius
         self.turn([angle, -angle])
         self.loc.loc_rotation(math.degrees(-radius))
-        if verbose or all_verbose: print "Completed right turn " + str(radius)
+        if verbose or robot.all_verbose: print "Completed right turn " + str(radius)
 
     def turnLeftRad(self, radius, verbose=False):
         length = radius * robot.wheel_separation / 2
         angle = length / robot.wheel_radius
         self.turn([-angle, angle])
         self.loc.loc_rotation(math.degrees(radius))
-        if verbose or all_verbose: print "Completed left turn " + str(radius)
+        if verbose or robot.all_verbose: print "Completed left turn " + str(radius)
 
     def turnRightDeg(self, degrees):
         self.turnRightRad(math.radians(degrees))
@@ -260,11 +259,10 @@ class robot:
     #############################################################################
 
     def enableBumper(self, verbose=False):
-        global bumper_enabled
         self.sensorEnableTouch(robot.left_touch)
         self.sensorEnableTouch(robot.right_touch)
         if verbose or robot.all_verbose: print "Bumper Enabled"
-        bumper_enabled = True
+        robot.bumper_enabled = True
 
     def enableSonar(self, verbose=False):
         self.sensorEnableUltrasonic(robot.sonar)
@@ -278,10 +276,9 @@ class robot:
   
 
     def disableBumper(self):
-        global bumper_enabled
         self.sensorDisable(robot.left_touch)
         self.sensorDisable(robot.right_touch)
-        bumper_enabled = False
+        robot.bumper_enabled = False
 
     def disableSonar(self):
         self.sensorDisable(robot.sonar)
@@ -290,7 +287,6 @@ class robot:
         return self.getSensorValue(robot.left_touch)[0] or self.getSensorValue(robot.right_touch)[0]
 
     def recover(self):
-        global in_recovery
         left = self.getSensorValue(robot.left_touch)[0]
         right = self.getSensorValue(robot.right_touch)[0]
         in_recovery = True
@@ -304,7 +300,7 @@ class robot:
         elif right:
             print "Recovering from right"
             self.turnLeft90()
-        in_recovery = False
+        robot.in_recovery = False
 
     #############################################################################
     ########     LOCALISATION METHODS    ########################################

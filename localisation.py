@@ -7,9 +7,9 @@ from wallMap import WallMap
 class localisation:
 
     # Offsets for visualisation
-    origin_offset_x = 200
-    origin_offset_y = 200
-    scalar = 10
+    origin_offset_x = 0
+    origin_offset_y = 0
+    scalar = 3.5
 
     NUM_OF_PARTS = 100
 
@@ -31,7 +31,7 @@ class localisation:
 
     @staticmethod
     def norm_output(value):
-        return round(2, value)
+        return round(value, 2)
 
     @staticmethod
     def draw_particles(particles):
@@ -116,9 +116,9 @@ class localisation:
         self.draw_particles(self.particles)
 
     def get_average(self):
-        av_x = 0
-        av_y = 0
-        av_t = 0
+        av_x = 0.0
+        av_y = 0.0
+        av_t = 0.0
         for p in range(localisation.NUM_OF_PARTS):
             av_x += self.weightings[p] * self.particles[p][localisation.X]
             av_y += self.weightings[p] * self.particles[p][localisation.Y]
@@ -146,13 +146,16 @@ class localisation:
         self.cumulative_weight = np.cumsum(self.weightings)
 
         # Resample
-	particles_old = self.particles[:]
+        particles_old = self.particles[:]
         for i in range(localisation.NUM_OF_PARTS):
             rand = np.random.random_sample()
             for j in range(localisation.NUM_OF_PARTS):
                 if rand < self.cumulative_weight[j]:
                     self.particles[i]  = particles_old[j]
                     break
+        # Change all weights to 1/n
+        for i in range(localisation.NUM_OF_PARTS):
+	    self.weightings[i] = 1.0 / localisation.NUM_OF_PARTS   
 
 
     # Returns a likelihood given a particle and mean sonar measurement
