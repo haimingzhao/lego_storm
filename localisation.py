@@ -131,24 +131,24 @@ class localisation:
             particle = self.particles[i]
             likely =  calculateLikelihood(particle, z, var)
             w = self.weightings[i]
-            #update the weighting of the particle based on likelyhood
+            # Update the weighting of the particle based on likelyhood
             self.weightings[i] = likely * w
             total_weight += self.weightings[i]
 
-        #normalise the weights
+        # Normalise the weights
         for i in range(localisation.NUM_OF_PARTS):
             self.weightings[i] = self.weightings[i] / total_weight
 
-        #sets the cumulative weight for resampling
+        # Sets the cumulative weight for resampling
         self.cumulative_weight = np.cumsum(self.weightings)
 
-        #way to cumbersome, looking into paper for O(n) time
-        #This is the resampling section
+        # Resample
+	particles_old = self.particles[:]
         for i in range(localisation.NUM_OF_PARTS):
             rand = np.random.random_sample()
             for j in range(localisation.NUM_OF_PARTS):
                 if rand < self.cumulative_weight[j]:
-                    self.particles[i]  = self.particles[j]
+                    self.particles[i]  = particles_old[j]
                     break
 
 
@@ -159,7 +159,7 @@ class localisation:
         top = -(pow(diff,2))
         bottom = 2 * var
         # Can add constant value K to make it more robust
-        return math.e * (top / bottom)
+        return math.e * (top / float(bottom))
 
 
 
