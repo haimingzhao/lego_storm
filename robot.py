@@ -20,8 +20,6 @@ class robot:
     right_touch = 3
     left_touch = 2
     sonar = 1
-    bumper_enabled = False
-    in_recovery = False
 
     #############################################################################
     ########     MAGIC METHODS    ###############################################
@@ -57,6 +55,9 @@ class robot:
 
         # initialise localisation
         self.loc = localisation(draw, record)
+
+        self.bumper_enabled = False
+        self.in_recovery = False
 
     #############################################################################
     ########     PUBLIC BRICKPI INTERFACE METHODS    ############################
@@ -227,7 +228,7 @@ class robot:
     def instantStop(self, verbose=False):
         self.setMotorPwm(0, 0)
         self.setMotorPwm(1, 0)
-        if verbose or all_verbose: print "Instant stop!!!"
+        if verbose or robot.all_verbose: print "Instant stop!!!"
 
     def navigateToWaypoint(self, x, y):
         currentX, currentY, theta = self.loc.get_average()
@@ -237,22 +238,22 @@ class robot:
         beta = robot.normalise_angle(alpha - theta)
         distance = math.hypot(dx, dy)
         self.turnDeg(beta)
-	d = distance - 20
-	if d > 0:
-		self.forward(20)
-		self.getSonarAndUpdate()
-		# Continue navigating to x,y
-		self.navigateToWaypoint(x,y)
-	else:
-		self.forward(distance)
-		self.getSonarAndUpdate()
+        d = distance - 20
+        if d > 0:
+            self.forward(20)
+            self.getSonarAndUpdate()
+            # Continue navigating to x,y
+            self.navigateToWaypoint(x,y)
+        else:
+            self.forward(distance)
+            self.getSonarAndUpdate()
 	
     def getSonarAndUpdate(self):
         # Get sonar measurements
         sonarMeasurements = self.getSonarMeasurements(100)
         # Update particles
         self.loc.update(sonarMeasurements)
-	self.loc.drawAllParticles()
+        self.loc.drawAllParticles()
 
     #############################################################################
     ########     PUBLIC SENSOR METHODS    #######################################
@@ -262,14 +263,14 @@ class robot:
         self.sensorEnableTouch(robot.left_touch)
         self.sensorEnableTouch(robot.right_touch)
         if verbose or robot.all_verbose: print "Bumper Enabled"
-        robot.bumper_enabled = True
+        self.bumper_enabled = True
 
     def enableSonar(self, verbose=False):
         self.sensorEnableUltrasonic(robot.sonar)
         if verbose or robot.all_verbose: print "Sonar Enabled"
 
     def getSonarMeasurements(self, n):
-	readings = []
+        readings = []
         for i in range(n):
             readings.append(self.getSensorValue(robot.sonar)[0])
         return readings          
@@ -278,7 +279,7 @@ class robot:
     def disableBumper(self):
         self.sensorDisable(robot.left_touch)
         self.sensorDisable(robot.right_touch)
-        robot.bumper_enabled = False
+        self.bumper_enabled = False
 
     def disableSonar(self):
         self.sensorDisable(robot.sonar)
@@ -289,7 +290,7 @@ class robot:
     def recover(self):
         left = self.getSensorValue(robot.left_touch)[0]
         right = self.getSensorValue(robot.right_touch)[0]
-        in_recovery = True
+        self.in_recovery = True
         self.backward(10)
         if left and right:
             print "Recovering from both"
@@ -300,7 +301,7 @@ class robot:
         elif right:
             print "Recovering from right"
             self.turnLeft90()
-        robot.in_recovery = False
+        self.in_recovery = False
 
     #############################################################################
     ########     LOCALISATION METHODS    ########################################
@@ -336,7 +337,7 @@ class robot:
         angle = distance / robot.wheel_radius
         self.increaseMotorAngleReferences(robot.wheel_motors, [angle, angle])
         while not self.motorAngleReferencesReached(robot.wheel_motors):
-            if bumper_enabled and self.check_bumper() and not in_recovery:
+            if self.bumper_enabled and self.check_bumper() and not self.in_recovery:
                 self.instantStop()
                 self.recover()
                 break
