@@ -54,7 +54,6 @@ class WallMap:
         angle = math.acos(top / bottom)
         return angle
 
-
     @staticmethod
     def distanceBetweenPoints(p1, p2):
         x1, y1 = p1

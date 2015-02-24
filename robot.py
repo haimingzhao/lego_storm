@@ -247,7 +247,7 @@ class robot:
         alpha = math.degrees(math.atan2(dy, dx))
         beta = robot.normalise_angle(alpha - theta)
         distance = math.hypot(dx, dy)
-	
+
         if distance > 20:
             self.forward(20)
             self.getSonarAndUpdate()
@@ -288,7 +288,6 @@ class robot:
                 readings.append(reading + robot.sonar_offset)
         return readings          
   
-
     def disableBumper(self):
         self.sensorDisable(robot.left_touch)
         self.sensorDisable(robot.right_touch)
