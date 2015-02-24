@@ -42,7 +42,7 @@ class localisation:
         print "drawParticles:" + str(p)
 
     def __init__(self, x, y, theta, drawing=False, record=False):
-	self.origin = [(x, y, theta)]
+        self.origin = [(x, y, theta)]
         self.particles = self.origin * localisation.NUM_OF_PARTS
         self.wallMap = WallMap(self)
         self.wallMap.draw_walls()
@@ -129,9 +129,9 @@ class localisation:
     # Updates weights of all the particles using the likelihood function
     def update(self, sonarMeasurements):
         z = np.median(sonarMeasurements)
-	print "Median sonar value = " + str(z)
-	estimate_m = self.getDepthMeasurement(self.get_average())
-	print "Distance from estimate location to nearest wall = " + str(estimate_m) 
+        print "Median sonar value = " + str(z)
+        estimate_m = self.getDepthMeasurement(self.get_average())
+        print "Distance from estimate location to nearest wall = " + str(estimate_m)
         var = np.var(sonarMeasurements)
         total_weight = 0
         for i in range(localisation.NUM_OF_PARTS):
@@ -161,15 +161,15 @@ class localisation:
                     break
         # Change all weights to 1/n
         for i in range(localisation.NUM_OF_PARTS):
-	    self.weightings[i] = 1.0 / localisation.NUM_OF_PARTS   
-	print "Location(after update) = " + str(self.get_average())
+            self.weightings[i] = 1.0 / localisation.NUM_OF_PARTS
+        print "Location(after update) = " + str(self.get_average())
 
 
     # Returns a likelihood given a particle and mean sonar measurement
     def calculateLikelihood(self, p, z, var):
         m = self.getDepthMeasurement(p)
-	if m == -1:
-		return -1
+        if m == -1:
+            return -1
         diff = z - m
         top = -(pow(diff,2))
         bottom = 2 * var
@@ -188,7 +188,7 @@ class localisation:
         # Calculate the distance from each wall
         walls = self.wallMap.get_walls()
         for wall in walls:
-            distance = self.calcDistanceFromWall(wall, p)
+            distance = localisation.calcDistanceFromWall(wall, p)
             if distance > 0:
                 wallDistances.append((wall, distance))
         # Sort the distances
@@ -198,13 +198,14 @@ class localisation:
         x,y,theta = p
         for wall, m in wallDistances:
             meetPoint = (x+m*math.cos(math.radians(theta)) , y+m*math.sin(math.radians(theta)))
-            if self.wallMap.isOnWall(meetPoint, wall) and self.wallMap.reasonableAngle(theta, wall):
+            if WallMap.isOnWall(meetPoint, wall) and WallMap.reasonableAngle(theta, wall):
                 return m
         # Failed to find a distance
         return -1
 
 
-    def calcDistanceFromWall(self, wall, p):
+    @staticmethod
+    def calcDistanceFromWall(wall, p):
         Ax,Ay,Bx,By = wall
         x,y,theta = p
         cosTheta = math.cos(math.radians(theta))

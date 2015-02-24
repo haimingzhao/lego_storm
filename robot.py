@@ -240,7 +240,7 @@ class robot:
         distance = math.hypot(dx, dy)
         self.turnDeg(beta)
         if distance > 20:
-	    self.forward(20)
+            self.forward(20)
             self.getSonarAndUpdate()
             self.navigateToWaypoint(x,y)
         else:

@@ -22,6 +22,6 @@ for p in positions:
     x, y = p
     robot.navigateToWaypoint(x, y)
     
-robot.drawAll()
+robot.get_loc().drawAll()
 
 robot.terminate()

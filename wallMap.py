@@ -20,10 +20,11 @@ class WallMap:
         self.loc = loc
         self.walls = []
         self.walls += WALLS
-	self.route = []
-	self.route += ROUTE
+        self.route = []
+        self.route += ROUTE
 
-    def isOnWall(self, point, wall):
+    @staticmethod
+    def isOnWall(point, wall):
         wallA = (wall[0],wall[1])
         wallB = (wall[2],wall[3])
 
@@ -33,10 +34,11 @@ class WallMap:
 
         # Length of the wall
         wallLength = WallMap.distanceBetweenPoints(wallA, wallB)
-	return distWallA + distWallB == wallLength
+        return distWallA + distWallB == wallLength
 
 
-    def reasonableAngle(self, theta, wall):
+    @staticmethod
+    def reasonableAngle(theta, wall):
         theta = math.radians(theta)
         Ax, Ay, Bx, By = wall
         left = (Ay - By) * math.cos(theta)
@@ -49,9 +51,9 @@ class WallMap:
 
     @staticmethod
     def distanceBetweenPoints(p1, p2):
-	x1, y1 = p1
-	x2, y2 = p2
-	return math.hypot(x2 - x1, y2 - y1)
+        x1, y1 = p1
+        x2, y2 = p2
+        return math.hypot(x2 - x1, y2 - y1)
 
     def clear(self):
         self.walls = []
@@ -61,8 +63,8 @@ class WallMap:
             self.loc.draw_line(a[0], a[1], a[2], a[3])
 
     def draw_route(self):
-	for a in self.route:
-		self.loc.draw_line(a[0], a[1], a[2], a[3])
+        for a in self.route:
+            self.loc.draw_line(a[0], a[1], a[2], a[3])
 
     def get_walls(self):
         return self.walls
