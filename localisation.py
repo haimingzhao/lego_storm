@@ -21,7 +21,7 @@ class localisation:
     # value in cm
     LINEAR_DISTANCE = 1.3
     # value in degrees
-    LINEAR_ROTATION = 0.3
+    LINEAR_ROTATION = 0.2
     # value in degrees
     ROTATION = 2.0
 
@@ -123,7 +123,7 @@ class localisation:
             av_x += self.weightings[p] * self.particles[p][localisation.X]
             av_y += self.weightings[p] * self.particles[p][localisation.Y]
             av_t += self.weightings[p] * self.particles[p][localisation.THETA]
-        localisation.draw_particles([(localisation.norm_output(av_x), localisation.norm_output(av_y), av_t)])
+        #localisation.draw_particles([(localisation.norm_output(av_x), localisation.norm_output(av_y), av_t)])
         return localisation.norm_output(av_x), localisation.norm_output(av_y), av_t
 
     # Updates weights of all the particles using the likelihood function
@@ -167,7 +167,7 @@ class localisation:
 
     # Returns a likelihood given a particle and mean sonar measurement
     def calculateLikelihood(self, p, z, var):
-        m = self.getDepthMeasurement(p)
+        m, wall = self.getDepthMeasurement(p)
         if m == -1:
             return -1
         diff = z - m
@@ -199,9 +199,9 @@ class localisation:
         for wall, m in wallDistances:
             meetPoint = (x+m*math.cos(math.radians(theta)) , y+m*math.sin(math.radians(theta)))
             if WallMap.isOnWall(meetPoint, wall) and WallMap.reasonableAngle(theta, wall):
-                return m
+                return (m, wall)
         # Failed to find a distance
-        return -1
+        return (-1, -1)
 
 
     @staticmethod

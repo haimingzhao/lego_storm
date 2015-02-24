@@ -39,6 +39,12 @@ class WallMap:
 
     @staticmethod
     def reasonableAngle(theta, wall):
+        angle = WallMap.getAngleOnWall(theta, wall)
+        desired_val = math.radians(25)
+        return angle < desired_val
+  
+    @staticmethod
+    def getAngleOnWall(theta, wall):
         theta = math.radians(theta)
         Ax, Ay, Bx, By = wall
         left = (Ay - By) * math.cos(theta)
@@ -46,8 +52,7 @@ class WallMap:
         top = left + right
         bottom = math.sqrt(pow((Ay - By), 2) + pow((Bx - Ax), 2))
         angle = math.acos(top / bottom)
-        desired_val = math.radians(25)
-        return angle < desired_val
+        return angle
 
     @staticmethod
     def distanceBetweenPoints(p1, p2):
