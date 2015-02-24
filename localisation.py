@@ -11,7 +11,7 @@ class localisation:
     origin_offset_y = 750
     scalar = 3.5
 
-    NUM_OF_PARTS = 200
+    NUM_OF_PARTS = 100
 
     # Positions in particle vector
     X = 0
@@ -25,6 +25,8 @@ class localisation:
     # standard deviation value in degrees 
     # TODO: are these all standard deviations??? why this one is so big then
     ROTATION = 1.0
+
+    RECOVERY_ST = 50
 
     draw = False
 
@@ -51,6 +53,7 @@ class localisation:
         weight = float(1 / float(localisation.NUM_OF_PARTS))
         self.weightings = [weight] * localisation.NUM_OF_PARTS
         self.cumulative_weight = np.cumsum(self.weightings)
+        self.in_recovery = False
         global draw
         draw = drawing
         if record:
@@ -83,8 +86,8 @@ class localisation:
         return random.gauss(0, sigma)
 
     def update_particle_distance(self, pid, distance):
-        e = localisation.ran_gauss(localisation.LINEAR_DISTANCE)
-        f = localisation.ran_gauss(localisation.LINEAR_ROTATION)
+        e = localisation.ran_gauss(localisation.LINEAR_DISTANCE if not self.in_recovery else localisation.RECOVERY_ST)
+        f = localisation.ran_gauss(localisation.LINEAR_ROTATION if not self.in_recovery else localisation.RECOVERY_ST)
         x = self.particles[pid][localisation.X] + (distance+e)*math.cos(math.radians(self.particles[pid][localisation.THETA]))
         y = self.particles[pid][localisation.Y] + (distance+e)*math.sin(math.radians(self.particles[pid][localisation.THETA]))
         theta = self.particles[pid][localisation.THETA] + f
@@ -92,7 +95,7 @@ class localisation:
 
 
     def update_particle_rotation(self, pid, angle):
-        g = localisation.ran_gauss(localisation.ROTATION)
+        g = localisation.ran_gauss(localisation.ROTATION if not self.in_recovery else localisation.RECOVERY_ST)
         x = self.particles[pid][localisation.X]
         y = self.particles[pid][localisation.Y]
         theta = self.particles[pid][localisation.THETA] + angle + g

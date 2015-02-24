@@ -266,8 +266,8 @@ class robot:
         self.getSonarAndUpdate()
         self.turnDeg(90)
         self.getSonarAndUpdate()
-        # self.turnDeg(90)
-        # self.getSonarAndUpdate()
+        self.turnDeg(90)
+        self.getSonarAndUpdate()
 
     def getSonarAndUpdate(self):
         # Get sonar measurements
@@ -314,7 +314,9 @@ class robot:
         left = self.getSensorValue(robot.left_touch)[0]
         right = self.getSensorValue(robot.right_touch)[0]
         self.in_recovery = True
+        self.loc.in_recovery = True
         self.backward(10)
+        self.loc.in_recovery = False
         if left and right:
             print "Recovering from both"
             self.turnRight90()
@@ -324,9 +326,9 @@ class robot:
         elif right:
             print "Recovering from right"
             self.turnLeft90()
-        self.spread
         self.rotateAndUpdate()
         self.in_recovery = False
+        
 
     #############################################################################
     ########     LOCALISATION METHODS    ########################################
