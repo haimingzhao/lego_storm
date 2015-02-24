@@ -12,7 +12,7 @@ positions = [(180, 30),
              (84, 54),
              (84, 30)]
 
-robot = robot(84, 30, 0, False, True)
+robot = robot(84, 30, 0, True, True)
 robot.sensorEnableUltrasonic(port)
 robot.enableBumper()
 
@@ -22,6 +22,6 @@ for p in positions:
     x, y = p
     robot.navigateToWaypoint(x, y)
     
-robot.get_loc().drawAll()
+robot.get_loc().draw_all()
 
 robot.terminate()

@@ -2,6 +2,7 @@ import brickpi
 import time
 import math
 from localisation import localisation
+from wallMap import WallMap
 
 class robot:
     # WARNING: IT APPEARS SENSOR PORTS 4 & 5 ARE BROKEN
@@ -228,17 +229,25 @@ class robot:
 
     def instantStop(self, verbose=False):
         self.setMotorPwm(0, 0)
-        self.setMotorPwm(1, 0)
+        self.setMotorPwm(0, 0)
         if verbose or robot.all_verbose: print "Instant stop!!!"
 
     def navigateToWaypoint(self, x, y):
         currentX, currentY, theta = self.loc.get_average()
-        dx = x - currentX
+        dx = x - currentX 
         dy = y - currentY
         alpha = math.degrees(math.atan2(dy, dx))
         beta = robot.normalise_angle(alpha - theta)
         distance = math.hypot(dx, dy)
         self.turnDeg(beta)
+        self.getSonarAndUpdate()
+        currentX, currentY, theta = self.loc.get_average()
+        dx = x - currentX 
+        dy = y - currentY
+        alpha = math.degrees(math.atan2(dy, dx))
+        beta = robot.normalise_angle(alpha - theta)
+        distance = math.hypot(dx, dy)
+	
         if distance > 20:
             self.forward(20)
             self.getSonarAndUpdate()
@@ -247,12 +256,14 @@ class robot:
             self.forward(distance)
             self.getSonarAndUpdate()
             print "-------------->IM AT THE WAYPOINT : " + str(x) + ", " + str(y)
-	
+
+
     def getSonarAndUpdate(self):
         # Get sonar measurements
         sonarMeasurements = self.getSonarMeasurements(200)
         # Update particles
-        self.loc.update(sonarMeasurements)
+        if len(sonarMeasurements) > 0:
+            self.loc.update(sonarMeasurements)
         self.loc.drawAllParticles()
 
     #############################################################################
@@ -272,7 +283,9 @@ class robot:
     def getSonarMeasurements(self, n):
         readings = []
         for i in range(n):
-            readings.append(self.getSensorValue(robot.sonar)[0] + robot.sonar_offset)
+            reading = self.getSensorValue(robot.sonar)[0] 
+            if not reading == 255:
+                readings.append(reading + robot.sonar_offset)
         return readings          
   
 
@@ -337,10 +350,4 @@ class robot:
         angle = distance / robot.wheel_radius
         self.increaseMotorAngleReferences(robot.wheel_motors, [angle, angle])
         while not self.motorAngleReferencesReached(robot.wheel_motors):
-            if self.bumper_enabled and self.check_bumper() and not self.in_recovery:
-                self.instantStop()
-                self.recover()
-                break
-            time.sleep(0.1)
-
-
+            if self.bumper_e
