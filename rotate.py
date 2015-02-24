@@ -1,7 +1,7 @@
 from robot import robot
 import math
 
-robot = robot()
+robot = robot(0,0,0)
 
 while True:
 	rounds = float(input("Enter number of rounds : "))

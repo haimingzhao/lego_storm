@@ -1,8 +1,7 @@
 from robot import robot
 
-r = robot()
+r = robot(0,0,0)
 l = r.get_loc()
-p = (84,30,0)
 
 
 while True:

@@ -12,9 +12,7 @@ positions = [(180, 30),
              (84, 54),
              (84, 30)]
 
-robot = robot(True)
-l = robot.get_loc()
-l.setParticlesTo((84,30,0))
+robot = robot(84, 30, 0, True)
 robot.sensorEnableUltrasonic(port)
 robot.enableBumper()
 

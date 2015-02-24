@@ -8,7 +8,7 @@ class localisation:
 
     # Offsets for visualisation
     origin_offset_x = 0
-    origin_offset_y = 0
+    origin_offset_y = 750
     scalar = 3.5
 
     NUM_OF_PARTS = 100
@@ -19,13 +19,11 @@ class localisation:
     THETA = 2
 
     # value in cm
-    LINEAR_DISTANCE = 0.39
+    LINEAR_DISTANCE = 1.0
     # value in degrees
-    LINEAR_ROTATION = 0.1
+    LINEAR_ROTATION = 0.5
     # value in degrees
-    ROTATION = 0.39
-
-    origin = [(0,0,0)]
+    ROTATION = 2.0
 
     draw = False
 
@@ -43,10 +41,12 @@ class localisation:
             p[a] = (x,y,theta)
         print "drawParticles:" + str(p)
 
-    def __init__(self, drawing=False, record=False):
-        self.particles = localisation.origin * localisation.NUM_OF_PARTS
+    def __init__(self, x, y, theta, drawing=False, record=False):
+	self.origin = [(x, y, theta)]
+        self.particles = self.origin * localisation.NUM_OF_PARTS
         self.wallMap = WallMap(self)
         self.wallMap.draw_walls()
+        self.wallMap.draw_route()
         weight = float(1 / float(localisation.NUM_OF_PARTS))
         self.weightings = [weight] * localisation.NUM_OF_PARTS
         self.cumulative_weight = np.cumsum(self.weightings)
@@ -71,9 +71,9 @@ class localisation:
 
     def draw_line(self, x1, y1, x2, y2):
         x1 = (x1*self.scalar)+self.origin_offset_x
-        y1 = (y1*self.scalar)+self.origin_offset_y
+        y1 = -(y1*self.scalar)+self.origin_offset_y
         x2 = (x2*self.scalar)+self.origin_offset_x
-        y2 =(y2*self.scalar)+self.origin_offset_y
+        y2 = -(y2*self.scalar)+self.origin_offset_y
         line = (x1, y1, x2, y2)
         print "drawLine:" + str(line)
 
@@ -123,24 +123,33 @@ class localisation:
             av_x += self.weightings[p] * self.particles[p][localisation.X]
             av_y += self.weightings[p] * self.particles[p][localisation.Y]
             av_t += self.weightings[p] * self.particles[p][localisation.THETA]
+        #print "ESTIMATE LOC = " +  str((localisation.norm_output(av_x), localisation.norm_output(av_y), av_t))
         return localisation.norm_output(av_x), localisation.norm_output(av_y), av_t
 
     # Updates weights of all the particles using the likelihood function
     def update(self, sonarMeasurements):
         z = np.median(sonarMeasurements)
+	print "Median sonar value = " + str(z)
+	estimate_m = self.getDepthMeasurement(self.get_average())
+	print "Distance from estimate location to nearest wall = " + str(estimate_m) 
         var = np.var(sonarMeasurements)
         total_weight = 0
         for i in range(localisation.NUM_OF_PARTS):
             particle = self.particles[i]
             likely = self.calculateLikelihood(particle, z, var)
-            w = self.weightings[i]
-            # Update the weighting of the particle based on likelyhood
-            self.weightings[i] = likely * w
+            if not likely == -1:
+                w = self.weightings[i]
+                # Update the weighting of the particle based on likelyhood
+                self.weightings[i] = likely * w
             total_weight += self.weightings[i]
+
+	if total_weight == 0:
+		total_weight = localisation.NUM_OF_PARTS
 
         # Normalise the weights
         for i in range(localisation.NUM_OF_PARTS):
-            self.weightings[i] = self.weightings[i] / total_weight
+            w = self.weightings[i]
+            self.weightings[i] = w / total_weight
 
         # Sets the cumulative weight for resampling
         self.cumulative_weight = np.cumsum(self.weightings)
@@ -156,16 +165,22 @@ class localisation:
         # Change all weights to 1/n
         for i in range(localisation.NUM_OF_PARTS):
 	    self.weightings[i] = 1.0 / localisation.NUM_OF_PARTS   
+	print "Location(after update) = " + str(self.get_average())
 
 
     # Returns a likelihood given a particle and mean sonar measurement
     def calculateLikelihood(self, p, z, var):
         m = self.getDepthMeasurement(p)
+	if m == -1:
+		return -1
         diff = z - m
         top = -(pow(diff,2))
         bottom = 2 * var
+        # Quick fix, will email lecturer
+        if bottom == 0:
+            bottom = 4
         # Can add constant value K to make it more robust
-        return math.e * (top / float(bottom))
+        return pow(math.e, (top / float(bottom)))
 
 
 
@@ -177,7 +192,7 @@ class localisation:
         walls = self.wallMap.get_walls()
         for wall in walls:
             distance = self.calcDistanceFromWall(wall, p)
-            if distance >0:
+            if distance > 0:
                 wallDistances.append((wall, distance))
         # Sort the distances
         wallDistances = sorted(wallDistances, key=lambda x: x[1])
@@ -187,8 +202,6 @@ class localisation:
         for wall, m in wallDistances:
             meetPoint = (x+m*math.cos(math.radians(theta)) , y+m*math.sin(math.radians(theta)))
             if self.wallMap.isOnWall(meetPoint, wall) and self.wallMap.reasonableAngle(theta, wall):
-                print wall
-                print meetPoint
                 return m
         # Failed to find a distance
         return -1
@@ -202,11 +215,6 @@ class localisation:
         top = (By - Ay)*(Ax - x) - (Bx - Ax)*(Ay - y)
         bottom = (By - Ay)*cosTheta - (Bx - Ax)*sinTheta
         return -1 if bottom == 0 else top / float(bottom)
-
-
-    def setParticlesTo(self, position):
-        for p in self.particles:
-            p = position
 
 
     def getCumWeight(self):

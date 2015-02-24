@@ -16,16 +16,17 @@ class robot:
     wheel_motors = [0, 1]
     wheel_separation = 15.89
     sonar_motor = 2
-    all_verbose = True
+    all_verbose = False
     right_touch = 3
     left_touch = 2
     sonar = 1
+    sonar_offset = 10  
 
     #############################################################################
     ########     MAGIC METHODS    ###############################################
     #############################################################################
 
-    def __init__(self, draw=False, record=False):
+    def __init__(self, x, y, theta, draw=False, record=False):
         self.interface = brickpi.Interface()
 
         self.initialize()
@@ -54,7 +55,7 @@ class robot:
         self.setMotorAngleControllerParameters(robot.sonar_motor, motorParams)
 
         # initialise localisation
-        self.loc = localisation(draw, record)
+        self.loc = localisation(x,y,theta,draw, record)
 
         self.bumper_enabled = False
         self.in_recovery = False
@@ -232,25 +233,24 @@ class robot:
 
     def navigateToWaypoint(self, x, y):
         currentX, currentY, theta = self.loc.get_average()
-        dx = (100 * x) - currentX
-        dy = (100 * y) - currentY
+        dx = x - currentX
+        dy = y - currentY
         alpha = math.degrees(math.atan2(dy, dx))
         beta = robot.normalise_angle(alpha - theta)
         distance = math.hypot(dx, dy)
         self.turnDeg(beta)
-        d = distance - 20
-        if d > 0:
-            self.forward(20)
+        if distance > 20:
+	    self.forward(20)
             self.getSonarAndUpdate()
-            # Continue navigating to x,y
             self.navigateToWaypoint(x,y)
         else:
             self.forward(distance)
             self.getSonarAndUpdate()
+            print "-------------->IM AT THE WAYPOINT : " + str(x) + ", " + str(y)
 	
     def getSonarAndUpdate(self):
         # Get sonar measurements
-        sonarMeasurements = self.getSonarMeasurements(100)
+        sonarMeasurements = self.getSonarMeasurements(200)
         # Update particles
         self.loc.update(sonarMeasurements)
         self.loc.drawAllParticles()
@@ -272,7 +272,7 @@ class robot:
     def getSonarMeasurements(self, n):
         readings = []
         for i in range(n):
-            readings.append(self.getSensorValue(robot.sonar)[0])
+            readings.append(self.getSensorValue(robot.sonar)[0] + robot.sonar_offset)
         return readings          
   
 

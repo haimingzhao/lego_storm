@@ -4,6 +4,15 @@ WALLS = [(0,0,0,168), (0,168,84,168), (84,126,84,210),
 	 (84,210,168,210), (168,210,168,84), (168,84,210,84),
 	 (210,84,210,0), (210,0,0,0)]
 
+ROUTE = [(84,30,180,30),
+	 (180,30,180,54),
+	 (180,54,126,54),
+	 (126,54,126,168),
+	 (126,168,126,126),
+	 (126,126,30,54),
+	 (30,54,84,54),
+	 (84,54,84,30)]
+
 
 class WallMap:
 
@@ -11,6 +20,8 @@ class WallMap:
         self.loc = loc
         self.walls = []
         self.walls += WALLS
+	self.route = []
+	self.route += ROUTE
 
     def isOnWall(self, point, wall):
         wallA = (wall[0],wall[1])
@@ -48,6 +59,10 @@ class WallMap:
     def draw_walls(self):
         for a in self.walls:
             self.loc.draw_line(a[0], a[1], a[2], a[3])
+
+    def draw_route(self):
+	for a in self.route:
+		self.loc.draw_line(a[0], a[1], a[2], a[3])
 
     def get_walls(self):
         return self.walls
