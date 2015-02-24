@@ -15,7 +15,7 @@ class robot:
 
     wheel_radius = 2.8
     wheel_motors = [0, 1]
-    wheel_separation = 15.89
+    wheel_separation = 15.75
     sonar_motor = 2
     all_verbose = False
     right_touch = 3
@@ -324,6 +324,7 @@ class robot:
         elif right:
             print "Recovering from right"
             self.turnLeft90()
+        self.spread
         self.rotateAndUpdate()
         self.in_recovery = False
 
