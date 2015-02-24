@@ -123,7 +123,6 @@ class localisation:
             av_x += self.weightings[p] * self.particles[p][localisation.X]
             av_y += self.weightings[p] * self.particles[p][localisation.Y]
             av_t += self.weightings[p] * self.particles[p][localisation.THETA]
-        #print "ESTIMATE LOC = " +  str((localisation.norm_output(av_x), localisation.norm_output(av_y), av_t))
         return localisation.norm_output(av_x), localisation.norm_output(av_y), av_t
 
     # Updates weights of all the particles using the likelihood function

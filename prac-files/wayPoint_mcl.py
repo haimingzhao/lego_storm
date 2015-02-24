@@ -21,5 +21,7 @@ robot.enableBumper()
 for p in positions:
     x, y = p
     robot.navigateToWaypoint(x, y)
+    
+robot.drawAll()
 
 robot.terminate()
