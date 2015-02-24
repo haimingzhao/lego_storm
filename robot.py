@@ -257,6 +257,17 @@ class robot:
             self.getSonarAndUpdate()
             print "-------------->IM AT THE WAYPOINT : " + str(x) + ", " + str(y)
 
+    def rotateAndUpdate(self):
+        currentX, currentY, theta = self.loc.get_average()
+        print "~~~~~~~~~>I WANT TO ROTATEEEEE " 
+        self.turnDeg(90)
+        self.getSonarAndUpdate()
+        self.turnDeg(90)
+        self.getSonarAndUpdate()
+        self.turnDeg(90)
+        self.getSonarAndUpdate()
+        # self.turnDeg(90)
+        # self.getSonarAndUpdate()
 
     def getSonarAndUpdate(self):
         # Get sonar measurements
@@ -313,6 +324,7 @@ class robot:
         elif right:
             print "Recovering from right"
             self.turnLeft90()
+        self.rotateAndUpdate()
         self.in_recovery = False
 
     #############################################################################

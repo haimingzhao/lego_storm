@@ -11,19 +11,20 @@ class localisation:
     origin_offset_y = 750
     scalar = 3.5
 
-    NUM_OF_PARTS = 100
+    NUM_OF_PARTS = 200
 
     # Positions in particle vector
     X = 0
     Y = 1
     THETA = 2
 
-    # value in cm
+    # standard deviation value in cm
     LINEAR_DISTANCE = 1.3
-    # value in degrees
+    # standard deviation value in degrees
     LINEAR_ROTATION = 0.2
-    # value in degrees
-    ROTATION = 2.0
+    # standard deviation value in degrees 
+    # TODO: are these all standard deviations??? why this one is so big then
+    ROTATION = 1.0
 
     draw = False
 
