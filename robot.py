@@ -349,4 +349,8 @@ class robot:
         angle = distance / robot.wheel_radius
         self.increaseMotorAngleReferences(robot.wheel_motors, [angle, angle])
         while not self.motorAngleReferencesReached(robot.wheel_motors):
-            if self.bumper_e
+            if self.bumper_enabled and self.check_bumper() and not self.in_recovery:
+                self.instantStop()
+                self.recover()
+                break
+            time.sleep(0.1)
