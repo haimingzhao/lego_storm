@@ -19,9 +19,9 @@ class localisation:
     THETA = 2
 
     # value in cm
-    LINEAR_DISTANCE = 1.0
+    LINEAR_DISTANCE = 1.3
     # value in degrees
-    LINEAR_ROTATION = 0.5
+    LINEAR_ROTATION = 0.3
     # value in degrees
     ROTATION = 2.0
 
@@ -137,19 +137,16 @@ class localisation:
         for i in range(localisation.NUM_OF_PARTS):
             particle = self.particles[i]
             likely = self.calculateLikelihood(particle, z, var)
-            if not likely == -1:
+            if likely > 0:
                 w = self.weightings[i]
                 # Update the weighting of the particle based on likelyhood
                 self.weightings[i] = likely * w
             total_weight += self.weightings[i]
 
-	if total_weight == 0:
-		total_weight = localisation.NUM_OF_PARTS
-
         # Normalise the weights
         for i in range(localisation.NUM_OF_PARTS):
             w = self.weightings[i]
-            self.weightings[i] = w / total_weight
+            self.weightings[i] = w / total_weight if total_weight > 0 else w
 
         # Sets the cumulative weight for resampling
         self.cumulative_weight = np.cumsum(self.weightings)
@@ -177,7 +174,7 @@ class localisation:
         top = -(pow(diff,2))
         bottom = 2 * var
         # Quick fix, will email lecturer
-        if bottom == 0:
+        if bottom < 4:
             bottom = 4
         # Can add constant value K to make it more robust
         return pow(math.e, (top / float(bottom)))
