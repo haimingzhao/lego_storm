@@ -12,7 +12,7 @@ positions = [(180, 30),
              (84, 54),
              (84, 30)]
 
-robot = robot(84, 30, 0, True)
+robot = robot(84, 30, 0, True, True)
 robot.sensorEnableUltrasonic(port)
 robot.enableBumper()
 
