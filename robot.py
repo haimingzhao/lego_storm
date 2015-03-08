@@ -21,7 +21,9 @@ class robot:
     right_touch = 3
     left_touch = 2
     sonar = 1
-    sonar_offset = 10  
+    sonar_offset = 5
+    # sonar rotation offset, 0 is facing forward, positive is left/anticlockwise
+   
 
     #############################################################################
     ########     MAGIC METHODS    ###############################################
@@ -60,6 +62,8 @@ class robot:
 
         self.bumper_enabled = False
         self.in_recovery = False
+         # sonar rotation offset, 0 is facing forward, positive is left/anticlockwise
+        self.sonar_rotation_offset = 0 #initialise to 0
 
     #############################################################################
     ########     PUBLIC BRICKPI INTERFACE METHODS    ############################
@@ -183,6 +187,16 @@ class robot:
     #############################################################################
     ########     PUBLIC MOVEMENT METHODS    #####################################
     #############################################################################
+    #sonar spin
+    def sonarTurnLeftDeg(self, degrees):
+        self.turnSonar(math.radians(-degrees))
+        self.sonar_rotation_offset+=degrees
+        print "sonar_rotation_offset:"+str(self.sonar_rotation_offset)
+    
+    def sonarTurnRightDeg(self, degrees):
+        self.turnSonar(math.radians(degrees))
+        self.sonar_roation_offset-=degrees
+        print "sonar_rotation_offset:"+str(self.sonar_rotation_offset)
 
     # distance in cm
     def forward(self, distance, verbose=False):
@@ -190,8 +204,6 @@ class robot:
         self.loc.loc_distance(distance)
         if verbose or robot.all_verbose: print "Completed forward " + str(distance)
 
-    def backward(self, distance, verbose=False):
-        self.linearMove(-distance)
         self.loc.loc_distance(-distance)
         if verbose or robot.all_verbose: print "Completed backward " + str(distance)
 
@@ -305,11 +317,14 @@ class robot:
     def getSonarMeasurements(self, n):
         readings = []
         for i in range(n):
-            reading = self.getSensorValue(robot.sonar)[0] 
+            reading = self.getSonarSingle() 
             if not reading == 255:
                 readings.append(reading + robot.sonar_offset)
         return readings          
-  
+ 
+    def getSonarSingle(self):
+        return self.getSensorValue(robot.sonar)[0]
+
     def disableBumper(self):
         self.sensorDisable(robot.left_touch)
         self.sensorDisable(robot.right_touch)
@@ -348,6 +363,18 @@ class robot:
     def get_loc(self):
         return self.loc
 
+
+    def findDistance(self, dist):
+        # TODO: pick left/right at random
+        self.turnSonarTillDistance(dist)
+   
+    def createSignature(self):
+        measurements = self.turnSonarTakingMeasurements()
+        # TODO: save?
+        print measurements
+        print len(measurements)
+
+
     #############################################################################
     ########     PRIVATE METHODS    #############################################
     #############################################################################
@@ -370,6 +397,38 @@ class robot:
         while not self.motorAngleReferencesReached(robot.wheel_motors):
             time.sleep(0.1)
 
+    def turnSonarTakingMeasurements(self):
+        measurements = []
+        step = 10
+	for i in range(1,(360/step)+1):
+            self.increaseMotorAngleReference(robot.sonar_motor, math.radians(step))
+            while not self.motorAngleReferenceReached(robot.sonar_motor):
+	        time.sleep(0.1)
+            measurements.append(self.getSonarSingle())
+        self.increaseMotorAngleReference(robot.sonar_motor, math.radians(-360))
+	while not self.motorAngleReferenceReached(robot.sonar_motor):
+        	time.sleep(0.1)  
+	return measurements  
+        
+    def turnSonarTillDistance(self, distance):
+        sonar = self.getSonarMeasurements(1)[0]
+        sonars = [sonar]
+        self.increaseMotorAngleReferences(robot.wheel_motors, [math.radians(360),math.radians(-360)])
+        while not sonar in range(distance,distance):
+            sonar = self.getSonarMeasurements(1)[0]
+            sonars.append(sonar)
+        print sonars
+        self.instantStop(0)
+        self.instantStop(1)
+        # TODO: get new angle ref
+        # TODO: turn back
+        return -1
+
+    def turnSonar(self, angle):
+        self.increaseMotorAngleReference(robot.sonar_motor, angle)
+        while not self.motorAngleReferenceReached(robot.sonar_motor):
+            time.sleep(0.1)    
+
     # direction is true if forward, false if backward
     def linearMove(self, distance):
         angle = distance / robot.wheel_radius
@@ -380,3 +439,5 @@ class robot:
                 self.recover()
                 break
             time.sleep(0.1)
+import math
+from localisation import localisation

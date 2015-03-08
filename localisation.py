@@ -9,7 +9,7 @@ class localisation:
     # Offsets for visualisation
     origin_offset_x = 0
     origin_offset_y = 750
-    scalar = 3.5
+    scalar = 1.8
 
     NUM_OF_PARTS = 100
 
