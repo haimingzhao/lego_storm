@@ -20,9 +20,10 @@ robot.enableBumper()
 
 for p in positions:
     x, y = p
-    if p in ((126, 126), (30, 54)) :
-        robot.rotateAndUpdate()
     robot.navigateToWaypoint(x, y)
+    # if p in ((126, 126), (30, 54)) :
+    #    robot.rotateAndUpdate()
+    #    robot.navigateToWaypoint(x, y)
     
 robot.get_loc().draw_all()
 

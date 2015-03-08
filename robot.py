@@ -259,15 +259,26 @@ class robot:
 
     def rotateAndUpdate(self):
         currentX, currentY, theta = self.loc.get_average()
-        print "~~~~~~~~~>I WANT TO ROTATEEEEE " 
-        self.turnDeg(90)
+        # Turn to have theta 0 
+        print "^~~~~~~^ I WANT TO ROTATEeeeee :3" 
+        # Find out the closest angle in [0, 90, 180, 270]
+        diffs = [theta-0, theta-90, theta-180, theta-270];
+        
+        self.turnDeg(90 - (theta - 0 ))
         self.getSonarAndUpdate()
-        self.turnDeg(90)
+        # Now the theta should be 90
+        currentX, currentY, theta = self.loc.get_average()
+        self.turnDeg(90 - (theta - 90))
         self.getSonarAndUpdate()
-        self.turnDeg(90)
+        # Now the theta should be 180
+        currentX, currentY, theta = self.loc.get_average()
+        self.turnDeg(90 - (theta - 180))
         self.getSonarAndUpdate()
-        self.turnDeg(90)
+        # Now the theta should be 270
+        currentX, currentY, theta = self.loc.get_average()
+        self.turnDeg(90 - (theta - 270))
         self.getSonarAndUpdate()
+
 
     def getSonarAndUpdate(self):
         # Get sonar measurements
@@ -316,7 +327,6 @@ class robot:
         self.in_recovery = True
         self.loc.in_recovery = True
         self.backward(10)
-        self.loc.in_recovery = False
         if left and right:
             print "Recovering from both"
             self.turnRight90()
@@ -326,6 +336,7 @@ class robot:
         elif right:
             print "Recovering from right"
             self.turnLeft90()
+        self.loc.in_recovery = False
         self.rotateAndUpdate()
         self.in_recovery = False
         

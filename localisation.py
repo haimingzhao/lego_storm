@@ -19,12 +19,12 @@ class localisation:
     THETA = 2
 
     # standard deviation value in cm
-    LINEAR_DISTANCE = 1.3
+    LINEAR_DISTANCE = 1.5
     # standard deviation value in degrees
-    LINEAR_ROTATION = 0.2
+    LINEAR_ROTATION = 0.5
     # standard deviation value in degrees 
     # TODO: are these all standard deviations??? why this one is so big then
-    ROTATION = 1.0
+    ROTATION = 1.5
 
     RECOVERY_ST = 50
 
