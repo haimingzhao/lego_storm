@@ -8,7 +8,11 @@ robot.enableSonar()
 
 
 #robot.findDistance(63)
-robot.turnSonarTakingMeasurements()
+measurements = robot.turnSonarTakingMeasurementsSteps()
+print measurements
+toturn = robot.getMeanAngle(measurements)*10
+robot.turnLeftDeg(toturn)
+robot.forward(42)
 """
 robot.forward(42)
 robot.turnRightDeg(90)

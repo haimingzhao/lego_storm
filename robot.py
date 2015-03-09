@@ -374,13 +374,14 @@ class robot:
             sonar = self.getSonarMeasurements(1)[0]
             measurements.append(sonar)
         # process measurements 
-        m_degrees = []*360
+        m_degrees = []
         for i in range (0,360):
             measure_index = int((i/360.0)*len(measurements))         
             #for
             measure = measurements[measure_index]
-            offset = math.cos(math.radians(i))*self.sonar_offset        
-            m_degrees[i] = measure + offset
+            # offset = math.cos(math.radians(i))*self.sonar_offset
+            offset = 0       
+            m_degrees.append(measure + offset)
 
         print m_degrees
         print len(m_degrees)
@@ -392,8 +393,8 @@ class robot:
 
     @staticmethod
     def getMeanAngle(sonarMeasurements):
-        top = 64
-        low = 62
+        top = 75
+        low = 55
         ranges = []
         top_i = 0
         low_i = 0 
@@ -421,7 +422,7 @@ class robot:
             mid_angle = (ranges[0][0] + ranges[0][1] ) / 2.0
             pass
         if len(ranges)==2:
-            wrap_diff = ranges[1][0] - 360
+            wrap_diff = ranges[1][0] - len(sonarMeasurements)
             print wrap_diff
             mid_angle = (ranges[0][1] + wrap_diff) / 2.0
             print mid_angle
