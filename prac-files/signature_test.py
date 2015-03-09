@@ -1,13 +1,18 @@
 import sys
+import time
 sys.path.insert(0, '../')
 from robot import robot
 
 robot = robot(0, 0, 0, True, True)
+robot.enableSonar()
 
 
-robot.sensorEnableUltrasonic(robot.sonar)
+#robot.findDistance(63)
+robot.turnSonarTakingMeasurements()
 """
-m = robot.getSonarMeasurements(10)
-print m
+robot.forward(42)
+robot.turnRightDeg(90)
+robot.sonarSpin(90)
+robot.followWall(100, 21) 
+robot.sonarReset()
 """
-robot.findDistance(63)
