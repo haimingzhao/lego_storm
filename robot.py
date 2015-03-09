@@ -3,6 +3,7 @@ from localisation import localisation
 from wallMap import WallMap
 import time
 import math
+import numpy as np
 
 class robot:
     # WARNING: IT APPEARS SENSOR PORTS 4 & 5 ARE BROKEN
@@ -55,6 +56,21 @@ class robot:
 
         self.setMotorAngleControllerParameters(robot.wheel_motors[0], motorParams)
         self.setMotorAngleControllerParameters(robot.wheel_motors[1], motorParams)
+        
+        motorParams = self.interface.MotorAngleControllerParameters()
+        motorParams.maxRotationAcceleration = 2.0
+        motorParams.maxRotationSpeed = 3
+        motorParams.feedForwardGain = 255 / 20.0
+        motorParams.minPWM = 27
+        motorParams.pidParameters.minOutput = -255
+        motorParams.pidParameters.maxOutput = 255
+
+        # proportional gain, reduces error
+        motorParams.pidParameters.k_p = 270.0
+        # integral gain, removes steady_state error
+        motorParams.pidParameters.k_i = 200
+        # differential gain, reduce settling time
+        motorParams.pidParameters.k_d = 160
         self.setMotorAngleControllerParameters(robot.sonar_motor, motorParams)
 
         # initialise localisation
@@ -368,11 +384,20 @@ class robot:
     def turnSonarTakingMeasurements(self):
         # sonar = self.getSonarMeasurements(1)[0]
         measurements = []
+        initialMotorAngle = self.getMotorAngle(robot.sonar_motor)[0]
+        step = 2*math.pi / 360.0
+        next_step = initialMotorAngle 
         # left turning
-        self.increaseMotorAngleReference(robot.sonar_motor, -2*math.pi)
+        step_measurements = []
+        self.increaseMotorAngleReference(robot.sonar_motor, -math.radians(360))
         while not self.motorAngleReferenceReached(robot.sonar_motor):
-            sonar = self.getSonarMeasurements(1)[0]
-            measurements.append(sonar)
+            motorAngle = self.getMotorAngle(robot.sonar_motor)[0]
+            step_measurements.append(self.getSonarMeasurements(1)[0])
+            if motorAngle < next_step and len(measurements)<360:
+                measurements.append(int(np.median(step_measurements)))
+                step_measurements = []
+                next_step -= step
+        """
         # process measurements 
         m_degrees = []
         for i in range (0,360):
@@ -384,16 +409,16 @@ class robot:
             m_degrees.append(measure + offset)
 
         print m_degrees
-        print len(m_degrees)
-
+        print len(m_degrees)s
+        """
         self.sonar_rotation_offset += 360
         self.sonarReset() # turn right back to origin position
 
-        return m_degrees
+        return measurements
 
     @staticmethod
     def getMeanAngle(sonarMeasurements):
-        top = 75
+        top = 100
         low = 55
         ranges = []
         top_i = 0
