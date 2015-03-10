@@ -9,8 +9,6 @@ robot.enableSonar()
 
 # (273,21,-90), (525,21,-90), (21,21,-90)
 
-
-
 #robot.findDistance(63)
 measurements = robot.turnSonarTakingMeasurements()
 print measurements
@@ -40,24 +38,6 @@ else:
 
 robot.winTheChallenge(position)   
     
-
-    
-    
-    
-    
 print "MY POSITION = " + str(position)
 
 
-
-
-
-
-
-
-"""
-robot.forward(42)
-robot.turnRightDeg(90)
-robot.sonarSpin(90)
-robot.followWall(100, 21) 
-robot.sonarReset()
-"""

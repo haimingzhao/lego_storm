@@ -22,7 +22,7 @@ class robot:
     right_touch = 3
     left_touch = 2
     sonar = 1
-    sonar_offset = 5
+    sonar_offset = 0
     # sonar rotation offset, 0 is facing forward, positive is left/anticlockwise
    
 
@@ -247,7 +247,7 @@ class robot:
 
     def instantStop(self, verbose=False):
         self.setMotorPwm(0, 0)
-        self.setMotorPwm(0, 0)
+        self.setMotorPwm(1, 0)
         if verbose or robot.all_verbose: print "Instant stop!!!"
 
     def navigateToWaypoint(self, x, y):
@@ -346,7 +346,7 @@ class robot:
         right = self.getSensorValue(robot.right_touch)[0]
         self.in_recovery = True
         self.loc.in_recovery = True
-        self.backward(10)
+        self.forward(-10)
         if left and right:
             print "Recovering from both"
             self.turnRight90()
@@ -378,7 +378,6 @@ class robot:
         for i in range(1,(360/step)+1):
             self.sonarSpin(step)
             measurements.append(self.getSonarSingle())
-        self.sonarReset()  
         return measurements  
 
     def turnSonarTakingMeasurements(self):
@@ -397,23 +396,8 @@ class robot:
                 measurements.append(int(np.median(step_measurements)))
                 step_measurements = []
                 next_step -= step
-        """
-        # process measurements 
-        m_degrees = []
-        for i in range (0,360):
-            measure_index = int((i/360.0)*len(measurements))         
-            #for
-            measure = measurements[measure_index]
-            # offset = math.cos(math.radians(i))*self.sonar_offset
-            offset = 0       
-            m_degrees.append(measure + offset)
-
-        print m_degrees
-        print len(m_degrees)s
-        """
-        self.sonar_rotation_offset += 360
-        self.sonarReset() # turn right back to origin position
-
+        
+	self.sonar_rotation_offset += 360
         return measurements
 
     @staticmethod
@@ -488,41 +472,111 @@ class robot:
         print measurements
         print len(measurements)
 
-    def followWall(self, distance, wallDistance):
+    def followWallLeft(self, distance, wallDistance):
         vc = 8 # TODO
-        Kp = 0.25 # TODO
-        maxV = 15
+        Kp = 0.6 # TODO
+        maxV = 16
         initial0,initial1 = self.getMotorAngles(self.wheel_motors)
-        print initial0
-        print initial1
         angle_toreach0 = (distance / robot.wheel_radius) + initial0[0]
         angle_toreach1 = (distance / robot.wheel_radius) + initial1[0]
 
-        print self.getMotorAngle(0)
         while (self.getMotorAngle(0)[0]<angle_toreach0 and self.getMotorAngle(1)[0]<angle_toreach1):
-            sonar = self.getSonarMeasurements(1)[0] - self.sonar_offset
+            sonar = self.getSonarMeasurements(1)[0] - self.sonar_offset - 1
             diff = sonar - wallDistance            
-            if diff!= 0 :
-                print "diff = " + str(diff)
-                print "sonar = " + str(sonar)
-                # vr = vc + 0.5*Kp*diff 
-                # vl = vc - 0.5*Kp*diff
+            if sonar < 45 and sonar > 10:
+                #print "diff = " + str(diff)
+                #print "sonar = " + str(sonar)
                 vl = min(vc - 0.5*Kp*diff, maxV)
                 vr = min(vc + 0.5*Kp*diff, maxV)
-                if (self.sonar_rotation_offset > 0): 
-                    self.setMotorRotationSpeedReferences([0,1], [vl,vr])
-                else:
-                    self.setMotorRotationSpeedReferences([0,1], [vr,vl])
-                print "new speed left = " + str(vl)
-                print "new speed right = " + str(vr)
-                while not (self.motorRotationSpeedReferenceReached(0) and self.motorRotationSpeedReferenceReached(1)):
-                    time.sleep(0.1)
-        print self.getMotorAngle(0)
-        print self.getMotorAngle(1)
-        
+                vl = max(vl, 1)
+                vr = max(vr, 1)       
+                self.setMotorRotationSpeedReferences([0,1], [vl,vr])
+                #print "new speed left = " + str(vl)
+                #print "new speed right = " + str(vr)
+        self.instantStop()
+
+
+
+    def followWallBackwards(self, distance, wallDistance):
+        vc = 8 # TODO
+        Kp = 0.6 # TODO
+        maxV = 16
+        initial0,initial1 = self.getMotorAngles(self.wheel_motors)
+        angle_toreach0 = initial0[0] - (distance / robot.wheel_radius) 
+        angle_toreach1 = initial1[0] - (distance / robot.wheel_radius) 
+
+        while (self.getMotorAngle(0)[0]>angle_toreach0 and self.getMotorAngle(1)[0]>angle_toreach1):
+            sonar = self.getSonarMeasurements(1)[0] - self.sonar_offset - 1
+            diff = sonar - wallDistance           
+            if sonar < 45 and sonar > 10:
+                #print "diff = " + str(diff)
+                #print "sonar = " + str(sonar)
+                vl = min(vc - 0.5*Kp*diff, maxV)
+                vr = min(vc + 0.5*Kp*diff, maxV)
+                vl = max(vl, 1)
+                vr = max(vr, 1)       
+                self.setMotorRotationSpeedReferences([0,1], [-vl,-vr])
+                #print "new speed left = " + str(vl)
+                #print "new speed right = " + str(vr)
+        self.instantStop()
+        """
         self.setMotorRotationSpeedReferences([0,1], [0,0])
         while not (self.motorRotationSpeedReferenceReached(0) and self.motorRotationSpeedReferenceReached(1)):
                     time.sleep(0.1)
+        """
+    def winTheChallenge(self, position):
+       half = 240
+       full = 480
+       small = 30
+       if position=="middle":
+           self.turnRightDeg(90)
+           self.followWallLeft(half,21)#251
+           self.turnRightDeg(90)
+           self.followWallLeft(small,21)#42
+           # WE SHOULD BE AT POINT 1 NOW 
+           self.followWallBackwards(small,21)#42
+           self.turnLeftDeg(90)
+           self.followWallBackwards(full,21)#504
+           self.turnLeftDeg(90)
+           self.followWallBackwards(small,21)#42
+           # WE SHOULD BE AT POINT 3 NOW 
+           self.followWallLeft(small,21)
+           self.turnRightDeg(90)
+           self.followWallLeft(half,21)
+           self.turnRightDeg(90)
+           self.forward(42)
+       if position=="left":
+           self.turnRightDeg(90)
+           self.followWallLeft(half,21)
+           self.turnRightDeg(90)
+           self.forward(42)
+           self.forward(-42)
+           self.turnLeftDeg(90)
+           self.followWallLeft(half,21)
+           self.turnRightDeg(90)
+           self.followWallLeft(small,21)
+           self.followWallBackwards(small,21)
+           self.turnLeftDeg(90)
+           self.followWallBackwards(full,21)
+           self.turnLeftDeg(90)
+           self.followWallBackwards(small,21)
+       if position == "right":
+           self.turnRightDeg(90)
+           self.followWallBackwards(half,21)
+           self.turnLeftDeg(90)
+           self.forward(-42)
+           self.forward(42)
+           self.turnRightDeg(90)
+           self.followWallBackwards(half,21)
+           self.turnLeftDeg(90)
+           self.followWallBackwards(small,21)
+           self.followWallLeft(small,21)
+           self.turnRightDeg(90)
+           self.followWallLeft(full,21)
+           self.turnRightDeg(90)
+           self.followWallLeft(small,21)
+       print "WINNERS FROM LEEDSGHLEY"
+
 
     #############################################################################
     ########     PRIVATE METHODS    #############################################

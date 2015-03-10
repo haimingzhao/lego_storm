@@ -1,6 +1,8 @@
 DexterInd/*
 Imperial/*
 *.swp
+*.swm
+*.swn
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
