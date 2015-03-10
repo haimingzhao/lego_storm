@@ -2,7 +2,6 @@ from robot import robot
 import sys
 
 robot = robot()
-robot.enableBumper()
 
 try:
 	from msvcrt import getch

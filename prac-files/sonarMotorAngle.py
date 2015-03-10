@@ -10,3 +10,5 @@ m = robot.turnSonarTakingMeasurements()
 print m
 print len(m)
 
+robot.terminate()
+

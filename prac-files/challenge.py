@@ -1,6 +1,7 @@
 import sys
 sys.path.insert(0, '../')
 from robot import robot
+from datetime import datetime
 #import place
 
 ##########   GLOBALS   ##################
@@ -9,42 +10,6 @@ full = 480
 small = 30
 diswall = 24 # distance to look at wall
 disout = 42 # distance to get out from trap
-
-robot = robot(0, 0, 0, True, True)
-robot.enableSonar()
-
-# (273,21,-90), (525,21,-90), (21,21,-90)
-
-measurements = robot.turnSonarTakingMeasurements()
-#place.get_Loc(measurements)
-
-robot.sonarSpin(-90)
-toturn = robot.getMeanAngle(measurements)
-
-robot.turnLeftDeg(toturn-13)
-
-robot.forward(disout)
-
-#### ***Decide location
-sonarRight = robot.getSonarMeasurements(1)[0]
-robot.sonarSpin(-180)
-
-sonarLeft = robot.getSonarMeasurements(1)[0]
-
-if sonarRight > 30:
-    if sonarLeft > 30:
-        position = "middle"
-    else:
-        position = "left"
-else:
-    position = "right"
-
-
-#### *** Go to other points
-print "MY POSITION = " + position
-robot.winTheChallenge()
-
-########    METHODS TO WIN THE CHALLENGE    #######
 
 def routineMid():
     robot.turnRightDeg(90)
@@ -125,3 +90,42 @@ def winTheChallenge():
     if position == "right":
         routineRight(robot)
     print "WINNERS FROM LEEDSGHLEY"
+
+startTime = datetime.now()
+
+robot = robot(0, 0, 0, True, True)
+robot.enableSonar()
+
+# (273,21,-90), (525,21,-90), (21,21,-90)
+
+measurements = robot.turnSonarTakingMeasurements()
+#place.get_Loc(measurements)
+
+robot.sonarSpin(-90)
+toturn = robot.getMeanAngle(measurements)
+
+robot.turnLeftDeg(toturn-13)
+
+robot.forward(disout)
+
+#### ***Decide location
+sonarRight = robot.getSonarMeasurements(1)[0]
+robot.sonarSpin(-180)
+
+sonarLeft = robot.getSonarMeasurements(1)[0]
+
+if sonarRight > 30:
+    if sonarLeft > 30:
+        position = "middle"
+    else:
+        position = "left"
+else:
+    position = "right"
+
+
+#### *** Go to other points
+print "MY POSITION = " + position
+winTheChallenge()
+robot.terminate()
+
+print datetime.now() - startTime

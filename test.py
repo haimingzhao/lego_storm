@@ -9,3 +9,5 @@ measurements = [63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 
 
 print measurements
 print robot.getMeanAngle(measurements)
+
+robot.terminate()

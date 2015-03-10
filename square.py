@@ -5,6 +5,6 @@ robot = robot()
 for a in range(4):
 	for b in range(4):
 		robot.forward(10)
-	robot.turnRight90()
+	robot.turnRightDeg(90)
 
 robot.terminate()

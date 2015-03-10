@@ -20,3 +20,5 @@ while True:
     robot.followWallBackwards(200,23)
     robot.sonarReset()
     time.sleep(2)
+
+robot.terminate()

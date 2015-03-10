@@ -13,3 +13,5 @@ while True:
 
 
 	print m
+
+robot.terminate()

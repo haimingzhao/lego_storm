@@ -75,8 +75,6 @@ class robot:
         # initialise localisation
         self.loc = localisation(x,y,theta,draw, record)
 
-        self.bumper_enabled = False
-        self.in_recovery = False
          # sonar rotation offset, 0 is facing forward, positive is left/anticlockwise
         self.sonar_rotation_offset = 0 #initialise to 0
 
@@ -93,26 +91,13 @@ class robot:
     def terminate(self):
         self.interface.terminate()
 
-    # immediately stop all motors, stop the polling and control thread
-    # BAD FOR HARDWARE - DO NOT DO THIS!!!!!
-    def emergencyStop(self):
-        self.interface.emergencyStop()
-
     # start individual motors
     def motorEnable(self, port):
         self.interface.motorEnable(port)
 
-    # stop individual motors
-    def motorDisable(self, port):
-        self.interface.motorDisable(port)
-
     # activate individual sensors
     def sensorEnable(self, port, sensor_type):
         self.interface.sensorEnable(port, sensor_type)
-
-    # deactivate individual sensors
-    def sensorDisable(self, port):
-        self.interface.sensorDisable(port)
 
     # thread safe access to sensor values
     def getSensorValue(self, port):
@@ -127,10 +112,6 @@ class robot:
     def setMotorAngleControllerParameters(self, motor_port, motor_params):
         self.interface.setMotorAngleControllerParameters(motor_port, motor_params)
 
-    # set a controller speed reference -- overrides low-level setMotorPwm
-    def setMotorRotationSpeedReference(self, motor, speed):
-        self.interface.setMotorRotationSpeedReference(motor, speed)
-
     # set controller speed references -- overrides low-level setMotorPwm.
     # this version guarantees synchronous operation
     def setMotorRotationSpeedReferences(self, motors, speeds):
@@ -139,15 +120,6 @@ class robot:
     # figure out, if the set speed reference has been reached
     def motorRotationSpeedReferenceReached(self, motor):
         return self.interface.motorRotationSpeedReferenceReached(motor)
-
-    # set a controller angle reference
-    def setMotorAngleReference(self, motor, angle):
-        self.interface.setMotorAngleReference(motor, angle)
-
-    # set controller speed references
-    # this version guarantees synchronous
-    def setMotorAnglesReferences(self, motors, angles):
-        self.interface.setMotorAnglesReferences(motors, angles)
 
     # increase a controller angle reference
     def increaseMotorAngleReference(self, motor, angle):
@@ -169,8 +141,8 @@ class robot:
     # figure out, if the set angle reference has been reached
     def motorAngleReferencesReached(self, motors):
         return self.interface.motorAngleReferencesReached(motors)
-
-    # figure out, if the set angle reference has been reached
+    #
+    # # figure out, if the set angle reference has been reached
     def motorAngleReferenceReached(self, motor):
         return self.interface.motorAngleReferenceReached(motor)
 
@@ -186,18 +158,6 @@ class robot:
     def sensorEnableTouch(self, port):
         self.sensorEnable(port, brickpi.SensorType.SENSOR_TOUCH)
 
-
-    #############################################################################
-    ########     ENVIRONMENT CONTROL METHODS    #################################
-    #############################################################################
-
-    @staticmethod
-    def setAllVerbose(value):
-        robot.all_verbose = value
-
-    @staticmethod
-    def getAllVerbose():
-        return robot.all_verbose
 
     #############################################################################
     ########     PUBLIC MOVEMENT METHODS    #####################################
@@ -232,12 +192,6 @@ class robot:
     def turnLeftDeg(self, degrees):
         self.turnLeftRad(math.radians(degrees))
 
-    def turnRight90(self):
-        self.turnRightRad(math.pi / 2)
-
-    def turnLeft90(self):
-        self.turnLeftRad(math.pi / 2)
-
     def turnDeg(self, degrees):
         if degrees < 180:
             self.turnLeftDeg(degrees)
@@ -251,14 +205,14 @@ class robot:
 
     def navigateToWaypoint(self, x, y):
         currentX, currentY, theta = self.loc.get_average()
-        dx = x - currentX 
+        dx = x - currentX
         dy = y - currentY
         alpha = math.degrees(math.atan2(dy, dx))
         beta = robot.normalise_angle(alpha - theta)
         self.turnDeg(beta)
         self.getSonarAndUpdate()
         currentX, currentY, theta = self.loc.get_average()
-        dx = x - currentX 
+        dx = x - currentX
         dy = y - currentY
         distance = math.hypot(dx, dy)
 
@@ -273,9 +227,9 @@ class robot:
 
     def rotateAndUpdate(self):
         currentX, currentY, theta = self.loc.get_average()
-        # Turn to have theta 0 
+        # Turn to have theta 0
         print "^~~~~~~^ I WANT TO ROTATEeeeee :3"
-        
+
         self.turnDeg(90 - (theta - 0 ))
         self.getSonarAndUpdate()
         # Now the theta should be 90
@@ -304,12 +258,6 @@ class robot:
     ########     PUBLIC SENSOR METHODS    #######################################
     #############################################################################
 
-    def enableBumper(self, verbose=False):
-        self.sensorEnableTouch(robot.left_touch)
-        self.sensorEnableTouch(robot.right_touch)
-        if verbose or robot.all_verbose: print "Bumper Enabled"
-        self.bumper_enabled = True
-
     def enableSonar(self, verbose=False):
         self.sensorEnableUltrasonic(robot.sonar)
         if verbose or robot.all_verbose: print "Sonar Enabled"
@@ -317,42 +265,12 @@ class robot:
     def getSonarMeasurements(self, n):
         readings = []
         for i in range(n):
-            reading = self.getSonarSingle() 
+            reading = self.getSonarSingle()
             readings.append(reading + robot.sonar_offset)
-        return readings          
- 
+        return readings
+
     def getSonarSingle(self):
         return self.getSensorValue(robot.sonar)[0]
-
-    def disableBumper(self):
-        self.sensorDisable(robot.left_touch)
-        self.sensorDisable(robot.right_touch)
-        self.bumper_enabled = False
-
-    def disableSonar(self):
-        self.sensorDisable(robot.sonar)
-
-    def check_bumper(self):
-        return self.getSensorValue(robot.left_touch)[0] or self.getSensorValue(robot.right_touch)[0]
-
-    def recover(self):
-        left = self.getSensorValue(robot.left_touch)[0]
-        right = self.getSensorValue(robot.right_touch)[0]
-        self.in_recovery = True
-        self.loc.in_recovery = True
-        self.forward(-10)
-        if left and right:
-            print "Recovering from both"
-            self.turnRight90()
-        elif left:
-            print "Recovering from left"
-            self.turnRight90()
-        elif right:
-            print "Recovering from right"
-            self.turnLeft90()
-        self.loc.in_recovery = False
-        self.rotateAndUpdate()
-        self.in_recovery = False
 
     ##############SONAR TURNING#################
     #sonar spin left/anti-clockwise
@@ -362,25 +280,17 @@ class robot:
             time.sleep(0.1)
         self.sonar_rotation_offset += degrees
         print "SONAR rotation offset : " + str(self.sonar_rotation_offset)
-   
+
     #sonar return back to origin location
     def sonarReset(self):
         self.sonarSpin(-self.sonar_rotation_offset)
-  
-    def turnSonarTakingMeasurementsSteps(self):
-        measurements = []
-        step = 10
-        for i in range(1,(360/step)+1):
-            self.sonarSpin(step)
-            measurements.append(self.getSonarSingle())
-        return measurements  
 
     def turnSonarTakingMeasurements(self):
         # sonar = self.getSonarMeasurements(1)[0]
         measurements = []
         initialMotorAngle = self.getMotorAngle(robot.sonar_motor)[0]
         step = 2*math.pi / 360.0
-        next_step = initialMotorAngle 
+        next_step = initialMotorAngle
         # left turning
         step_measurements = []
         self.increaseMotorAngleReference(robot.sonar_motor, -math.radians(360))
@@ -391,7 +301,7 @@ class robot:
                 measurements.append(int(np.median(step_measurements)))
                 step_measurements = []
                 next_step -= step
-        
+
         self.sonar_rotation_offset += 360
         return measurements
 
@@ -401,7 +311,7 @@ class robot:
         low = 55
         ranges = []
         top_i = 0
-        low_i = 0 
+        low_i = 0
         j = 0
         started = False
         for m in sonarMeasurements:
@@ -430,9 +340,8 @@ class robot:
             print wrap_diff
             mid_angle = (ranges[0][1] + wrap_diff) / 2.0
             print mid_angle
- 
         return mid_angle
-        
+
     def turnSonarTillDistance(self, distance):
         length = 2*math.pi * robot.wheel_separation / 2
         angle = length / robot.wheel_radius
@@ -456,17 +365,6 @@ class robot:
     def get_loc(self):
         return self.loc
 
-
-    def findDistance(self, dist):
-        # TODO: pick left/right at random
-        self.turnSonarTillDistance(dist)
-   
-    def createSignature(self):
-        measurements = self.turnSonarTakingMeasurements()
-        # TODO: save?
-        print measurements
-        print len(measurements)
-
     def followWallLeft(self, distance, wallDistance):
         vc = 8 # TODO
         Kp = 0.6 # TODO
@@ -477,100 +375,42 @@ class robot:
 
         while self.getMotorAngle(0)[0]<angle_toreach0 and self.getMotorAngle(1)[0]<angle_toreach1:
             sonar = self.getSonarMeasurements(1)[0] - self.sonar_offset - 1
-            diff = sonar - wallDistance            
+            diff = sonar - wallDistance
             if 45 > sonar > 10:
                 #print "diff = " + str(diff)
                 #print "sonar = " + str(sonar)
                 vl = min(vc - 0.5*Kp*diff, maxV)
                 vr = min(vc + 0.5*Kp*diff, maxV)
                 vl = max(vl, 1)
-                vr = max(vr, 1)       
+                vr = max(vr, 1)
                 self.setMotorRotationSpeedReferences([0,1], [vl,vr])
                 #print "new speed left = " + str(vl)
                 #print "new speed right = " + str(vr)
         self.instantStop()
-
-
 
     def followWallBackwards(self, distance, wallDistance):
         vc = 8 # TODO
         Kp = 0.6 # TODO
         maxV = 16
         initial0,initial1 = self.getMotorAngles(self.wheel_motors)
-        angle_toreach0 = initial0[0] - (distance / robot.wheel_radius) 
-        angle_toreach1 = initial1[0] - (distance / robot.wheel_radius) 
+        angle_toreach0 = initial0[0] - (distance / robot.wheel_radius)
+        angle_toreach1 = initial1[0] - (distance / robot.wheel_radius)
 
         while self.getMotorAngle(0)[0]>angle_toreach0 and self.getMotorAngle(1)[0]>angle_toreach1:
             sonar = self.getSonarMeasurements(1)[0] - self.sonar_offset - 1
-            diff = sonar - wallDistance           
+            diff = sonar - wallDistance
             if 45 > sonar > 10:
                 #print "diff = " + str(diff)
                 #print "sonar = " + str(sonar)
                 vl = min(vc - 0.5*Kp*diff, maxV)
                 vr = min(vc + 0.5*Kp*diff, maxV)
                 vl = max(vl, 1)
-                vr = max(vr, 1)       
+                vr = max(vr, 1)
                 self.setMotorRotationSpeedReferences([0,1], [-vl,-vr])
                 #print "new speed left = " + str(vl)
                 #print "new speed right = " + str(vr)
         self.instantStop()
-        """
-        self.setMotorRotationSpeedReferences([0,1], [0,0])
-        while not (self.motorRotationSpeedReferenceReached(0) and self.motorRotationSpeedReferenceReached(1)):
-                    time.sleep(0.1)
-        """
-    def winTheChallenge(self, position):
-       half = 240
-       full = 480
-       small = 30
-       if position=="middle":
-           self.turnRightDeg(90)
-           self.followWallLeft(half,21)#251
-           self.turnRightDeg(90)
-           self.followWallLeft(small,21)#42
-           # WE SHOULD BE AT POINT 1 NOW 
-           self.followWallBackwards(small,21)#42
-           self.turnLeftDeg(90)
-           self.followWallBackwards(full,21)#504
-           self.turnLeftDeg(90)
-           self.followWallBackwards(small,21)#42
-           # WE SHOULD BE AT POINT 3 NOW 
-           self.followWallLeft(small,21)
-           self.turnRightDeg(90)
-           self.followWallLeft(half,21)
-           self.turnRightDeg(90)
-           self.forward(42)
-       if position=="left":
-           self.turnRightDeg(90)
-           self.followWallLeft(half,21)
-           self.turnRightDeg(90)
-           self.forward(42)
-           self.forward(-42)
-           self.turnLeftDeg(90)
-           self.followWallLeft(half,21)
-           self.turnRightDeg(90)
-           self.followWallLeft(small,21)
-           self.followWallBackwards(small,21)
-           self.turnLeftDeg(90)
-           self.followWallBackwards(full,21)
-           self.turnLeftDeg(90)
-           self.followWallBackwards(small,21)
-       if position == "right":
-           self.turnRightDeg(90)
-           self.followWallBackwards(half,21)
-           self.turnLeftDeg(90)
-           self.forward(-42)
-           self.forward(42)
-           self.turnRightDeg(90)
-           self.followWallBackwards(half,21)
-           self.turnLeftDeg(90)
-           self.followWallBackwards(small,21)
-           self.followWallLeft(small,21)
-           self.turnRightDeg(90)
-           self.followWallLeft(full,21)
-           self.turnRightDeg(90)
-           self.followWallLeft(small,21)
-       print "WINNERS FROM LEEDSGHLEY"
+
 
 
     #############################################################################
@@ -586,22 +426,14 @@ class robot:
         else :
             return angle
 
-    @staticmethod
-    def wheelRadianTurn(radians):
-        return (radians * robot.wheel_separation) / (2 * robot.wheel_radius)
-
     def turn(self, angles):
         self.increaseMotorAngleReferences(robot.wheel_motors, angles)
         while not self.motorAngleReferencesReached(robot.wheel_motors):
-            time.sleep(0.1)   
+            time.sleep(0.1)
 
     # direction is true if forward, false if backward
     def linearMove(self, distance):
         angle = distance / robot.wheel_radius
         self.increaseMotorAngleReferences(robot.wheel_motors, [angle, angle])
         while not self.motorAngleReferencesReached(robot.wheel_motors):
-            if self.bumper_enabled and self.check_bumper() and not self.in_recovery:
-                self.instantStop()
-                self.recover()
-                break
             time.sleep(0.1)

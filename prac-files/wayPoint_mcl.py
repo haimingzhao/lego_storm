@@ -14,7 +14,6 @@ positions = [(180, 30),
 
 robot = robot(84, 30, 0, True, True)
 robot.sensorEnableUltrasonic(port)
-robot.enableBumper()
 
 # remember to change origin in localisation to (84,30)
 

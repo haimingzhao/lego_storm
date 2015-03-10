@@ -65,14 +65,6 @@ class localisation:
         if drawing:
             localisation.draw_particles(self.particles)
 
-
-    def wrap(self, angle):
-        if angle < 0:
-            return self.wrap(angle + 360)
-        if angle > 360:
-            return self.wrap(angle - 360)
-        return angle
-
     def draw_line(self, x1, y1, x2, y2):
         x1 = (x1*self.scalar)+self.origin_offset_x
         y1 = -(y1*self.scalar)+self.origin_offset_y
@@ -168,7 +160,6 @@ class localisation:
             self.weightings[i] = 1.0 / localisation.NUM_OF_PARTS
         print "Location(after update) = " + str(self.get_average())
 
-
     # Returns a likelihood given a particle and mean sonar measurement
     def calculateLikelihood(self, p, z, var):
         m, wall = self.getDepthMeasurement(p)
@@ -182,8 +173,6 @@ class localisation:
             bottom = 4
         # Can add constant value K to make it more robust
         return pow(math.e, (top / float(bottom)))
-
-
 
     # Finds out which wall is the robot facing and gets "true" distance from it
     def getDepthMeasurement(self, p):
@@ -207,7 +196,6 @@ class localisation:
         # Failed to find a distance
         return -1, -1
 
-
     @staticmethod
     def calcDistanceFromWall(wall, p):
         Ax,Ay,Bx,By = wall
@@ -217,7 +205,3 @@ class localisation:
         top = (By - Ay)*(Ax - x) - (Bx - Ax)*(Ay - y)
         bottom = (By - Ay)*cosTheta - (Bx - Ax)*sinTheta
         return -1 if bottom == 0 else top / float(bottom)
-
-
-    def getCumWeight(self):
-        return self.cumulative_weight

@@ -57,9 +57,6 @@ class WallMap:
         x2, y2 = p2
         return math.hypot(x2 - x1, y2 - y1)
 
-    def clear(self):
-        self.walls = []
-
     def draw_walls(self):
         for a in self.walls:
             self.loc.draw_line(a[0], a[1], a[2], a[3])
