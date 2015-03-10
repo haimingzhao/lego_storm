@@ -1,8 +1,7 @@
 import sys
-import time
 sys.path.insert(0, '../')
 from robot import robot
-from place import place
+import place
 
 robot = robot(0, 0, 0, True, True)
 robot.enableSonar()

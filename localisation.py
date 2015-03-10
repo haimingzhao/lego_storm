@@ -196,16 +196,16 @@ class localisation:
             if distance > 0:
                 wallDistances.append((wall, distance))
         # Sort the distances
-        wallDistances = sorted(wallDistances, key=lambda x: x[1])
+        wallDistances = sorted(wallDistances, key=lambda z: z[1])
 
         # Take the smallest distance, while checking if the point actually is on the wall
         x,y,theta = p
         for wall, m in wallDistances:
             meetPoint = (x+m*math.cos(math.radians(theta)) , y+m*math.sin(math.radians(theta)))
             if WallMap.isOnWall(meetPoint, wall) and WallMap.reasonableAngle(theta, wall):
-                return (m, wall)
+                return m, wall
         # Failed to find a distance
-        return (-1, -1)
+        return -1, -1
 
 
     @staticmethod

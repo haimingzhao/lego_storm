@@ -1,6 +1,5 @@
 import brickpi
 from localisation import localisation
-from wallMap import WallMap
 import time
 import math
 import numpy as np
@@ -256,14 +255,11 @@ class robot:
         dy = y - currentY
         alpha = math.degrees(math.atan2(dy, dx))
         beta = robot.normalise_angle(alpha - theta)
-        distance = math.hypot(dx, dy)
         self.turnDeg(beta)
         self.getSonarAndUpdate()
         currentX, currentY, theta = self.loc.get_average()
         dx = x - currentX 
         dy = y - currentY
-        alpha = math.degrees(math.atan2(dy, dx))
-        beta = robot.normalise_angle(alpha - theta)
         distance = math.hypot(dx, dy)
 
         if distance > 20:
@@ -278,9 +274,7 @@ class robot:
     def rotateAndUpdate(self):
         currentX, currentY, theta = self.loc.get_average()
         # Turn to have theta 0 
-        print "^~~~~~~^ I WANT TO ROTATEeeeee :3" 
-        # Find out the closest angle in [0, 90, 180, 270]
-        diffs = [theta-0, theta-90, theta-180, theta-270];
+        print "^~~~~~~^ I WANT TO ROTATEeeeee :3"
         
         self.turnDeg(90 - (theta - 0 ))
         self.getSonarAndUpdate()
@@ -481,10 +475,10 @@ class robot:
         angle_toreach0 = (distance / robot.wheel_radius) + initial0[0]
         angle_toreach1 = (distance / robot.wheel_radius) + initial1[0]
 
-        while (self.getMotorAngle(0)[0]<angle_toreach0 and self.getMotorAngle(1)[0]<angle_toreach1):
+        while self.getMotorAngle(0)[0]<angle_toreach0 and self.getMotorAngle(1)[0]<angle_toreach1:
             sonar = self.getSonarMeasurements(1)[0] - self.sonar_offset - 1
             diff = sonar - wallDistance            
-            if sonar < 45 and sonar > 10:
+            if 45 > sonar > 10:
                 #print "diff = " + str(diff)
                 #print "sonar = " + str(sonar)
                 vl = min(vc - 0.5*Kp*diff, maxV)
@@ -506,10 +500,10 @@ class robot:
         angle_toreach0 = initial0[0] - (distance / robot.wheel_radius) 
         angle_toreach1 = initial1[0] - (distance / robot.wheel_radius) 
 
-        while (self.getMotorAngle(0)[0]>angle_toreach0 and self.getMotorAngle(1)[0]>angle_toreach1):
+        while self.getMotorAngle(0)[0]>angle_toreach0 and self.getMotorAngle(1)[0]>angle_toreach1:
             sonar = self.getSonarMeasurements(1)[0] - self.sonar_offset - 1
             diff = sonar - wallDistance           
-            if sonar < 45 and sonar > 10:
+            if 45 > sonar > 10:
                 #print "diff = " + str(diff)
                 #print "sonar = " + str(sonar)
                 vl = min(vc - 0.5*Kp*diff, maxV)
