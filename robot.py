@@ -367,6 +367,7 @@ class robot:
         while not self.motorAngleReferenceReached(robot.sonar_motor):
             time.sleep(0.1)
         self.sonar_rotation_offset += degrees
+        print "SONAR rotation offset : " + str(self.sonar_rotation_offset)
    
     #sonar return back to origin location
     def sonarReset(self):
@@ -397,7 +398,7 @@ class robot:
                 step_measurements = []
                 next_step -= step
         
-	self.sonar_rotation_offset += 360
+        self.sonar_rotation_offset += 360
         return measurements
 
     @staticmethod
