@@ -3,6 +3,7 @@ sys.path.insert(0, '../')
 from robot import robot
 from datetime import datetime
 # import place
+import time
 
 ##########   GLOBALS   ##################
 half = 256
@@ -34,6 +35,7 @@ def routineMid():
 
     robot.followWallLeft(distance,diswall)
     print "!! I AM AT POINT 1 !!"
+    # time.sleep(1)
 
     robot.sonarSpin(angle*2)
     robot.followWallBackwards(small,diswall)
@@ -48,6 +50,7 @@ def routineMid():
 
     robot.followWallBackwards(distance, diswall)
     print "!! I AM AT POINT 3 !!"
+    # time.sleep(1)
 
     robot.sonarSpin(-angle*2)
     robot.followWallLeft(small,diswall)
@@ -79,6 +82,7 @@ def routineLeft():
     runToWallAt21()
     # robot.forward(42)
     print "!! I AM AT POINT 2 !!"
+    # time.sleep(1)
 
     robot.forward(-42)
     robot.turnLeftDeg(90)
@@ -93,6 +97,7 @@ def routineLeft():
     
     robot.followWallLeft(distance, diswall)
     print "!! I AM AT POINT 1 !!"
+    # time.sleep(1)
 
     robot.sonarSpin(2*angle)
     robot.followWallBackwards(small,diswall)
@@ -121,6 +126,7 @@ def routineRight():
     robot.sonarSpin(-(90+angle)) # i am looking at small wall
     runToWallAt21() 
     print "!! I AM AT POINT 2 !!"
+    # time.sleep(1)
 
     robot.forward(-42)
     robot.turnLeftDeg(90)
@@ -136,6 +142,7 @@ def routineRight():
 
     robot.followWallBackwards(distance, diswall)
     print "!! I AM AT POINT 3 !!"
+    # time.sleep(1)
 
     robot.sonarSpin(-(angle*2))
     robot.followWallLeft(small,diswall)
@@ -162,13 +169,13 @@ def winTheChallenge():
         routineRight()
     print "WINNERS FROM LEEDSGHLEY"
 
-startTime = datetime.now()
 
 robot = robot(0, 0, 0, True, True)
 robot.enableSonar()
 
 # (273,21,-90), (525,21,-90), (21,21,-90)
 
+startTime = datetime.now()
 measurements = robot.turnSonarTakingMeasurements()
 # place.get_Loc(measurements)
 
