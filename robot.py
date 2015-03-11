@@ -23,7 +23,7 @@ class robot:
     sonar = 1
     sonar_offset = 0
     # sonar rotation offset, 0 is facing forward, positive is left/anticlockwise
-   
+    kp = 1.4
 
     #############################################################################
     ########     MAGIC METHODS    ###############################################
@@ -73,7 +73,7 @@ class robot:
         self.setMotorAngleControllerParameters(robot.sonar_motor, motorParams)
 
         # initialise localisation
-        self.loc = localisation(x,y,theta,draw, record)
+        #self.loc = localisation(x,y,theta,draw, record)
 
          # sonar rotation offset, 0 is facing forward, positive is left/anticlockwise
         self.sonar_rotation_offset = 0 #initialise to 0
@@ -88,8 +88,8 @@ class robot:
         self.interface.initialize()
 
     # softly stop all motors and sensors, stop the polling and control thread
-    def terminate(self):
-        self.interface.terminate()
+    # def terminate(self):
+    #     self.interface.terminate()
 
     # start individual motors
     def motorEnable(self, port):
@@ -166,24 +166,24 @@ class robot:
     # distance in cm
     def forward(self, distance, verbose=False):
         self.linearMove(distance)
-        self.loc.loc_distance(distance)
+        #self.loc.loc_distance(distance)
         if verbose or robot.all_verbose: print "Completed forward " + str(distance)
 
-        self.loc.loc_distance(-distance)
+        #self.loc.loc_distance(-distance)
         if verbose or robot.all_verbose: print "Completed backward " + str(distance)
 
     def turnRightRad(self, radius, verbose=False):
         length = radius * robot.wheel_separation / 2
         angle = length / robot.wheel_radius
         self.turn([angle, -angle])
-        self.loc.loc_rotation(math.degrees(-radius))
+        #self.loc.loc_rotation(math.degrees(-radius))
         if verbose or robot.all_verbose: print "Completed right turn " + str(radius)
 
     def turnLeftRad(self, radius, verbose=False):
         length = radius * robot.wheel_separation / 2
         angle = length / robot.wheel_radius
         self.turn([-angle, angle])
-        self.loc.loc_rotation(math.degrees(radius))
+        #self.loc.loc_rotation(math.degrees(radius))
         if verbose or robot.all_verbose: print "Completed left turn " + str(radius)
 
     def turnRightDeg(self, degrees):
@@ -270,7 +270,10 @@ class robot:
         return readings
 
     def getSonarSingle(self):
-        return self.getSensorValue(robot.sonar)[0]
+        m = self.getSensorValue(robot.sonar)
+        while len(m) != 2:
+            m = self.getSensorValue(robot.sonar)
+        return m[0]
 
     ##############SONAR TURNING#################
     #sonar spin left/anti-clockwise
@@ -329,13 +332,19 @@ class robot:
             j += 1
         if started:
             ranges.append((low_i,top_i))
-        assert(len(ranges)<=2)
+        # assert(len(ranges)<=2)
+        # if (len(ranges) == 2) and (not ranges[1][1] == 360):
+        #     ranges = [(ranges[0][0], ranges[1][1])]
+        if (len(ranges)>2):
+            print "range bigger than 2, dont know what to do"
+            # ranges = [(ranges[0][0], ranges[1][1])]
         print ranges
         mid_angle = 0
         if len(ranges)==1:
             mid_angle = (ranges[0][0] + ranges[0][1] ) / 2.0
             pass
-        if len(ranges)==2:
+        # if len(ranges)==2:
+        else:
             wrap_diff = ranges[1][0] - len(sonarMeasurements)
             print wrap_diff
             mid_angle = (ranges[0][1] + wrap_diff) / 2.0
@@ -367,48 +376,51 @@ class robot:
 
     def followWallLeft(self, distance, wallDistance):
         vc = 8 # TODO
-        Kp = 0.6 # TODO
+        Kp = robot.kp # TODO
         maxV = 16
         initial0,initial1 = self.getMotorAngles(self.wheel_motors)
         angle_toreach0 = (distance / robot.wheel_radius) + initial0[0]
         angle_toreach1 = (distance / robot.wheel_radius) + initial1[0]
 
         while self.getMotorAngle(0)[0]<angle_toreach0 and self.getMotorAngle(1)[0]<angle_toreach1:
-            sonar = self.getSonarMeasurements(1)[0] - self.sonar_offset - 1
+            sonar = self.getSonarMeasurements(1)[0] - self.sonar_offset 
             diff = sonar - wallDistance
             if 45 > sonar > 10:
                 #print "diff = " + str(diff)
                 #print "sonar = " + str(sonar)
                 vl = min(vc - 0.5*Kp*diff, maxV)
                 vr = min(vc + 0.5*Kp*diff, maxV)
-                vl = max(vl, 1)
-                vr = max(vr, 1)
+                vl = max(vl, 5)
+                vr = max(vr, 5)
                 self.setMotorRotationSpeedReferences([0,1], [vl,vr])
                 #print "new speed left = " + str(vl)
                 #print "new speed right = " + str(vr)
+                time.sleep(0.1)
         self.instantStop()
 
     def followWallBackwards(self, distance, wallDistance):
         vc = 8 # TODO
-        Kp = 0.6 # TODO
+        Kp = robot.kp # TODO
         maxV = 16
         initial0,initial1 = self.getMotorAngles(self.wheel_motors)
         angle_toreach0 = initial0[0] - (distance / robot.wheel_radius)
         angle_toreach1 = initial1[0] - (distance / robot.wheel_radius)
 
         while self.getMotorAngle(0)[0]>angle_toreach0 and self.getMotorAngle(1)[0]>angle_toreach1:
-            sonar = self.getSonarMeasurements(1)[0] - self.sonar_offset - 1
+            sonar = self.getSonarMeasurements(1)[0] - self.sonar_offset 
             diff = sonar - wallDistance
             if 45 > sonar > 10:
-                #print "diff = " + str(diff)
-                #print "sonar = " + str(sonar)
+                print "diff = " + str(diff)
+                print "sonar = " + str(sonar)
                 vl = min(vc - 0.5*Kp*diff, maxV)
                 vr = min(vc + 0.5*Kp*diff, maxV)
-                vl = max(vl, 1)
-                vr = max(vr, 1)
+                vl = max(vl, 5)
+                vr = max(vr, 5)
+
                 self.setMotorRotationSpeedReferences([0,1], [-vl,-vr])
-                #print "new speed left = " + str(vl)
-                #print "new speed right = " + str(vr)
+                print "new speed left = " + str(vl)
+                print "new speed right = " + str(vr)
+                time.sleep(0.1)
         self.instantStop()
 
 
