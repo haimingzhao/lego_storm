@@ -12,12 +12,11 @@ robot.enableSonar()
 
 #robot.findDistance(63)
 while True:
-    robot.sonarSpin(115)
-    robot.followWallBackwards(200,25)
+    robot.sonarSpin(110)
+    robot.followWallBackwards(400,25)
     time.sleep(2)
-    robot.sonarSpin(-50)
-    robot.followWallLeft(200,25)
+    robot.sonarSpin(-40)
+    robot.followWallLeft(400,25)
     time.sleep(2)
     robot.sonar_reset();
-
 

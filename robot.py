@@ -23,7 +23,7 @@ class robot:
     sonar = 1
     sonar_offset = 0
     # sonar rotation offset, 0 is facing forward, positive is left/anticlockwise
-    kp = 1.4
+    kp = 1.1
 
     #############################################################################
     ########     MAGIC METHODS    ###############################################
@@ -39,9 +39,9 @@ class robot:
         self.motorEnable(robot.sonar_motor)
 
         motorParams = self.interface.MotorAngleControllerParameters()
-        motorParams.maxRotationAcceleration = 3.0
-        motorParams.maxRotationSpeed = 6.0
-        motorParams.feedForwardGain = 255 / 30.0
+        motorParams.maxRotationAcceleration = 7.0
+        motorParams.maxRotationSpeed = 12.0
+        motorParams.feedForwardGain = 255 / 20.0
         motorParams.minPWM = 25
         motorParams.pidParameters.minOutput = -255
         motorParams.pidParameters.maxOutput = 255
@@ -375,9 +375,10 @@ class robot:
         return self.loc
 
     def followWallLeft(self, distance, wallDistance):
-        vc = 8 # TODO
+        vc = 14 # TODO
         Kp = robot.kp # TODO
-        maxV = 16
+        maxV = 19
+        minV = 9
         initial0,initial1 = self.getMotorAngles(self.wheel_motors)
         angle_toreach0 = (distance / robot.wheel_radius) + initial0[0]
         angle_toreach1 = (distance / robot.wheel_radius) + initial1[0]
@@ -390,8 +391,8 @@ class robot:
                 #print "sonar = " + str(sonar)
                 vl = min(vc - 0.5*Kp*diff, maxV)
                 vr = min(vc + 0.5*Kp*diff, maxV)
-                vl = max(vl, 5)
-                vr = max(vr, 5)
+                vl = max(vl, minV)
+                vr = max(vr, minV)
                 self.setMotorRotationSpeedReferences([0,1], [vl,vr])
                 #print "new speed left = " + str(vl)
                 #print "new speed right = " + str(vr)
@@ -399,9 +400,10 @@ class robot:
         self.instantStop()
 
     def followWallBackwards(self, distance, wallDistance):
-        vc = 8 # TODO
+        vc = 14 # TODO
         Kp = robot.kp # TODO
-        maxV = 16
+        maxV = 17.5
+        minV = 9
         initial0,initial1 = self.getMotorAngles(self.wheel_motors)
         angle_toreach0 = initial0[0] - (distance / robot.wheel_radius)
         angle_toreach1 = initial1[0] - (distance / robot.wheel_radius)
@@ -414,8 +416,8 @@ class robot:
                 print "sonar = " + str(sonar)
                 vl = min(vc - 0.5*Kp*diff, maxV)
                 vr = min(vc + 0.5*Kp*diff, maxV)
-                vl = max(vl, 5)
-                vr = max(vr, 5)
+                vl = max(vl, minV)
+                vr = max(vr, minV)
 
                 self.setMotorRotationSpeedReferences([0,1], [-vl,-vr])
                 print "new speed left = " + str(vl)

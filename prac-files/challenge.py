@@ -15,6 +15,10 @@ diswall = 21 # distance to look at wall
 disout = 42 # distance to get out from trap
 angle = 20
 
+
+
+
+
 def runToWallAt21(forward=1): # -1 for backward
     toWall = robot.getSonarSingle() + 5 - 21
     if forward == -1:
@@ -35,7 +39,7 @@ def routineMid():
 
     robot.followWallLeft(distance,diswall)
     print "!! I AM AT POINT 1 !!"
-    # time.sleep(1)
+    time.sleep(1)
 
     robot.sonarSpin(angle*2)
     robot.followWallBackwards(small,diswall)
@@ -50,7 +54,7 @@ def routineMid():
 
     robot.followWallBackwards(distance, diswall)
     print "!! I AM AT POINT 3 !!"
-    # time.sleep(1)
+    time.sleep(1)
 
     robot.sonarSpin(-angle*2)
     robot.followWallLeft(small,diswall)
@@ -82,7 +86,7 @@ def routineLeft():
     runToWallAt21()
     # robot.forward(42)
     print "!! I AM AT POINT 2 !!"
-    # time.sleep(1)
+    time.sleep(1)
 
     robot.forward(-42)
     robot.turnLeftDeg(90)
@@ -97,7 +101,7 @@ def routineLeft():
     
     robot.followWallLeft(distance, diswall)
     print "!! I AM AT POINT 1 !!"
-    # time.sleep(1)
+    time.sleep(1)
 
     robot.sonarSpin(2*angle)
     robot.followWallBackwards(small,diswall)
@@ -126,7 +130,7 @@ def routineRight():
     robot.sonarSpin(-(90+angle)) # i am looking at small wall
     runToWallAt21() 
     print "!! I AM AT POINT 2 !!"
-    # time.sleep(1)
+    time.sleep(1)
 
     robot.forward(-42)
     robot.turnLeftDeg(90)
@@ -142,7 +146,7 @@ def routineRight():
 
     robot.followWallBackwards(distance, diswall)
     print "!! I AM AT POINT 3 !!"
-    # time.sleep(1)
+    time.sleep(1)
 
     robot.sonarSpin(-(angle*2))
     robot.followWallLeft(small,diswall)
@@ -173,10 +177,27 @@ def winTheChallenge():
 robot = robot(0, 0, 0, True, True)
 robot.enableSonar()
 
+
+# Fast sensor motor params
+fastParams = robot.interface.MotorAngleControllerParameters()
+fastParams.maxRotationAcceleration = 7.0
+fastParams.maxRotationSpeed = 12.0
+fastParams.feedForwardGain = 255 / 15
+fastParams.minPWM = 25
+fastParams.pidParameters.minOutput = -255
+fastParams.pidParameters.maxOutput = 255
+fastParams.pidParameters.k_p = 270
+fastParams.pidParameters.k_i = 400
+fastParams.pidParameters.k_d = 160
+
 # (273,21,-90), (525,21,-90), (21,21,-90)
 
 startTime = datetime.now()
 measurements = robot.turnSonarTakingMeasurements()
+
+# Change sonar to move FASTAAAAAAAAAAAAR!
+robot.setMotorAngleControllerParameters(robot.sonar_motor, fastParams)
+
 # place.get_Loc(measurements)
 
 robot.sonarSpin(-90)
@@ -187,8 +208,13 @@ robot.turnLeftDeg(toturn)
 
 robot.forward(disout)
 
+
+
+
 #### ***Decide location
 sonarRight = robot.getSonarMeasurements(1)[0]
+
+
 robot.sonarSpin(-180)
 
 sonarLeft = robot.getSonarMeasurements(1)[0]
