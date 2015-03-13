@@ -335,17 +335,26 @@ class robot:
         # assert(len(ranges)<=2)
         # if (len(ranges) == 2) and (not ranges[1][1] == 360):
         #     ranges = [(ranges[0][0], ranges[1][1])]
-        if (len(ranges)>2):
-            print "range bigger than 2, dont know what to do"
-            # ranges = [(ranges[0][0], ranges[1][1])]
         print ranges
         mid_angle = 0
-        if len(ranges)==1:
-            mid_angle = (ranges[0][0] + ranges[0][1] ) / 2.0
+        #if len(ranges)==1:
+        if not ranges[len(ranges)-1][1] == len[sonarMeasurements]: # if the last one is not at the end
+            #mid_angle = (ranges[0][0] + ranges[0][1] ) / 2.0
+            mid_angle = (ranges[0][0] + ranges[len(ranges)-1][1] ) / 2.0 # compute the interval of all
             pass
-        # if len(ranges)==2:
         else:
-            wrap_diff = ranges[1][0] - len(sonarMeasurements)
+            #wrap_diff = ranges[1][0] - len(sonarMeasurements)
+            # need to find the biggers interval
+            end = 0 # end of the from part in measurements
+            start = 0 # start of the tail part in measurements
+            current_diff = 0
+            assert(len(ranges)-2 >= 0)
+            for int i in range(0,len(ranges)-2):
+                end = ranges[i][1]
+                start = ranges[i+1][0]
+                if (start - end) > current_diff:
+                    current_diff = start - end
+            wrap_diff = start - len(sonarMeasurements) 
             print wrap_diff
             mid_angle = (ranges[0][1] + wrap_diff) / 2.0
             print mid_angle
